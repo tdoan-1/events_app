@@ -1,14 +1,18 @@
 import React from "react";
-import header from 
+import Header from "./components/Header";
+import EventList from "./components/EventList";
+import Footer from "./components/Footer";
+
 function App() {
   return (
     <div className="App">
-      <header />
+      <Header />
+      <p>todays Date 2/19</p>
       <main>
-        <eventlist />
+        <EventList />
       </main>
-      <footer />
-      <h1>Welcome to my webesite!</h1>
+      <Footer />
+      <h1>thank you for checking us out!</h1>
     </div>
   );
 }

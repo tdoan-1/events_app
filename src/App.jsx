@@ -1,9 +1,11 @@
 import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
-import EventList from "./components/EventList";
 import Footer from "./components/Footer";
 import { useEffect, useState } from "react";
 import { getConferences } from "./api.js";
+import Home from "./components/Home";
+import MainMenu from "./components/MainMenu";
 
 function App() {
   const [conferences, setConferences] = useState([]);
@@ -17,21 +19,16 @@ function App() {
 
 
   return (
-    <div className="App">
-      <Header/>
-      <h2>Upcoming Conferences</h2>
-      <ul>
-        {conferences.map((conference, index) => (
-          <li key={index}>
-            <h3>{conference.title}</h3>
-            <p>{conference.location}</p>
-            <p>{conference.date}</p>
-          </li>
-        ))}
-      </ul>
-      <EventList/>
-      <Footer/>
-    </div>
+    <Router>
+      <div className="App">
+        <Header />
+        <Routes>
+          <Route path="/" element={<MainMenu />} />
+          <Route path="/home" element={<Home />} />
+        </Routes>
+        <Footer />
+      </div>
+    </Router>
   );
 }
 

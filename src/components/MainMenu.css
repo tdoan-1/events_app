@@ -1,0 +1,17 @@
+.main-menu {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+  }
+  
+  .main-menu h1 {
+    margin-bottom: 20px;
+  }
+  
+  .main-menu button {
+    padding: 10px 20px;
+    font-size: 16px;
+  }

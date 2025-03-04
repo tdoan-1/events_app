@@ -7,9 +7,9 @@ function EventList() {
     <div>
       <h2>Upcoming Events</h2>
       <ul>
-        <li>make website work</li>
-        <li>break website</li>
-        <li>make it work again</li>
+        <li>Make website work.</li>
+        <li>Break website.</li>
+        <li>Make it work again.</li>
       </ul>
     </div>
   );

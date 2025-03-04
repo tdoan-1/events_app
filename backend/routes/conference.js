@@ -9,7 +9,7 @@ router.get('/list', (req, res) => {
     // test data
     res.json([
         { title: "Tech Meeting", location: "Silvercreek", date: "2030-06-15" },
-        { title: "WORLD SUMMIT", location: "New York City", date: "2034-07-20" }
+        { title: "World Summit", location: "New York City", date: "2034-07-20" }
     ]);
 
     // fetch data from database

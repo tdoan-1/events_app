@@ -8,6 +8,8 @@ import Home from "./components/Home";
 import MainMenu from "./components/MainMenu";
 
 function App() {
+
+  // 'setConferences' is the function to update 'conferences'
   const [conferences, setConferences] = useState([]);
 
   //sends request to backend

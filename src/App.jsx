@@ -2,10 +2,24 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import { useEffect, useState } from "react";
+import { getConferences } from "./api.js";
 import Home from "./components/Home";
 import MainMenu from "./components/MainMenu";
 
 function App() {
+
+  // 'setConferences' is the function to update 'conferences'
+  const [conferences, setConferences] = useState([]);
+
+  //sends request to backend
+  useEffect(() => {
+    getConferences().then((data) => {
+      setConferences(data);
+    });
+  }, []);
+
+
   return (
     <Router>
       <div className="App">

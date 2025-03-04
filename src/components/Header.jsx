@@ -1,9 +1,10 @@
 import React from "react";
+import './Header.css'; // Import the CSS file
 
 function Header() {
   return (
-    <header>
-      <h1>Conference Events</h1>
+    <header className="header">
+      <h1>Events Planner</h1>
     </header>
   );
 }

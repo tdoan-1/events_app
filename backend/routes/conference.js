@@ -4,23 +4,25 @@ const prisma = new PrismaClient();  // instantiate PrismaClient
 const router = express.Router(); // creating router
 
 // API to fetch list of conferences
-router.get('/list', (req, res) => {
-
-    // test data
-    res.json([
-        { title: "Tech Meeting", location: "Silvercreek", date: "2030-06-15" },
-        { title: "World Summit", location: "New York City", date: "2034-07-20" }
-    ]);
+router.get('/list', async (req, res) => {
 
     // fetch data from database
-    /*
     try {
         const conferences = await prisma.conference.findMany();
-        res.json(conferences);
-    } catch (error) {
-        res.status(500).json({ error: "Failed to fetch conferences" });
+        const conferenceData = [...conferences,
+
+            // test data
+            { conf_id: "N/A", title: "Tech Meeting", 
+                location: "Silvercreek", date: "2030-06-15", time: "3:00pm" },
+            { conf_id: "N/A", title: "World Summit", 
+                location: "New York City", date: "2037-07-20", time: "10:00am" },
+        ];
+        res.json(conferenceData);
+    } 
+    catch (error) {
+        console.log({ error: "Failed to fetch conferences" });
     }
-    */
+    
 });
 
 // API to create conference

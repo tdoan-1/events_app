@@ -15,15 +15,15 @@ app.get('/test-db', async (req, res) => {
         const conference = await prisma.conference.findMany(); // fetch all conferences
         res.json(conference);
     } catch (error) {
-        res.status(500).json({ error: "Database query failed" });
+        console.log({ error: "Failed to fetch conferences" });
     }
 });
 
 // test route
 app.get('/', (req, res) => {
-    res.send('Can Confirm: Backend Works.');
+    res.send('Backend server is running 🗿');
 });
 
 // starting server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`GREATEST SERVER ON PORT ${PORT}`));
+app.listen(PORT, () => console.log(`GREATEST SERVER ACTIVATED: PORT ${PORT}`));

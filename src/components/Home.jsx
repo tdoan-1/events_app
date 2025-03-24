@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import EventList from "./EventList";
-import { useEffect, useState } from "react";
 import { getConferences } from "../api.js";
 
 function Home() {
@@ -32,9 +31,18 @@ function Home() {
   return (
     <div>
       <p>Today's Date: time for you to get a watch(its march 5th)</p>
+      <ul>
+         {conferences.map((conference, index) => (
+           <li key={index}>
+             <h3>{conference.title}</h3>
+             <p>{conference.location}</p>
+             <p>{conference.date}</p>
+           </li>
+         ))}
+       </ul>
       <main>
         <EventList />
-        <button onClick={handleClick}>Click me</button>
+        <button onClick={() => console.log("Button clicked!")}>Click me</button>
       </main>
     </div>
   );

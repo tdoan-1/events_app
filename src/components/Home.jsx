@@ -34,9 +34,9 @@ function Home() {
       <ul>
          {conferences.map((conference, index) => (
            <li key={index}>
-             <h3>{conference.title}</h3>
-             <p>{conference.location}</p>
+             <h3>{conference.conf_id}</h3>
              <p>{conference.date}</p>
+             <p>{conference.time}</p>
            </li>
          ))}
        </ul>

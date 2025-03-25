@@ -15,7 +15,7 @@ app.get('/test-db', async (req, res) => {
         const conference = await prisma.conference.findMany(); // fetch all conferences
         res.json(conference);
     } catch (error) {
-        console.log({ error: "Failed to fetch conferences" });
+        console.log({ error: "Failed to fetch conferences from server.js" });
     }
 });
 

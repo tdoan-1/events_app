@@ -9,8 +9,8 @@ const conferenceRoutes = require('./routes/conference'); // import routes
 app.use('/api/conference', conferenceRoutes); // use the routes
 app.use(express.json());  // allow JSON request bodies
 
-// test database
-app.get('/test-db', async (req, res) => {
+// database
+app.get('/db', async (req, res) => {
     try {
         const conference = await prisma.conference.findMany(); // fetch all conferences
         res.json(conference);
@@ -19,7 +19,7 @@ app.get('/test-db', async (req, res) => {
     }
 });
 
-// test route
+// route
 app.get('/', (req, res) => {
     res.send('Backend server is running 🗿');
 });

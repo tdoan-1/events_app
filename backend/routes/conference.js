@@ -25,14 +25,13 @@ router.get('/list', async (req, res) => {
 );
 
 // API to create conference
-/*
 router.post('/create', (req, res) => {
-    const { date, time } = req.body;
-    if (!date || !time ) {
+    const { title, loca, dates } = req.body;
+    if (!title || !loca || !dates ) {
         return res.status(400).json({ message: "All fields are required" });
     }
-    res.status(201).json({ message: "Conference created successfully.", data: { title, location, date } });
-}); */
+    res.status(201).json({ message: "Conference created successfully.", data: { title, loca, dates } });
+}); 
 
 // export router to use in `server.js`
 module.exports = router;

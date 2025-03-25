@@ -37,6 +37,7 @@ function EventList() {
     <div>
       <h2>Upcoming Events</h2>
       <ul>
+      {/* Display the list of conferences from database*/}
         {conferences.map((conference, index) => (
           <li key={index}>
             <h3>{conference.conference_id}</h3> 

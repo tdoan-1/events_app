@@ -32,14 +32,15 @@ function Home() {
     <div>
       <p>Today's Date: time for you to get a watch(its march 5th)</p>
       <ul>
-         {conferences.map((conference, index) => (
-           <li key={index}>
-             <h3>{conference.conf_id}</h3>
-             <p>{conference.date}</p>
-             <p>{conference.time}</p>
-           </li>
-         ))}
-       </ul>
+  {conferences.map((conference, index) => (
+    <li key={index}>
+      <h3>{conference.conference_id}</h3> 
+      <p>{conference.title}</p>
+      <p>{conference.loca}</p>
+      <p>{conference.dates}</p>
+    </li>
+  ))}
+</ul>
       <main>
         <EventList />
         <button onClick={() => console.log("Button clicked!")}>Click me</button>

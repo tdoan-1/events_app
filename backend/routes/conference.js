@@ -25,12 +25,28 @@ router.get('/list', async (req, res) => {
 );
 
 // API to create conference
-router.post('/create', (req, res) => {
-    const { title, loca, dates } = req.body;
-    if (!title || !loca || !dates ) {
+router.post('/create', async (req, res) => {
+    const { title, short_name, loca, dates } = req.body;
+    if (!title || !short_name || !loca || !dates ) {
         return res.status(400).json({ message: "All fields are required" });
     }
-    res.status(201).json({ message: "Conference created successfully.", data: { title, loca, dates } });
+
+    try {
+      const newConference = await prisma.conference.create({
+        data: {
+          title,
+          short_name,
+          loca,
+          dates: new Date(dates) // make sure this is a Date object
+        }
+      });
+
+      res.status(201).json({ message: "Conference created successfully.", data: { title, short_name, loca, dates } });
+    } 
+    catch {
+      console.error("Error creating conference:", error);
+      res.status(500).json({ message: "Failed to create conference." });
+    }
 }); 
 
 // export router to use in `server.js`

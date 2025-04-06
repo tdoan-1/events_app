@@ -5,23 +5,24 @@ const prisma = new PrismaClient();  // instantiate PrismaClient
 
 const app = express();
 app.use(cors());  // enable CORS
+app.use(express.json());  // allow JSON request bodies
 const conferenceRoutes = require('./routes/conference'); // import routes
 app.use('/api/conference', conferenceRoutes); // use the routes
-app.use(express.json());  // allow JSON request bodies
 
-// test database
-app.get('/test-db', async (req, res) => {
+// route for database
+app.get('/db', async (req, res) => {
     try {
         const conference = await prisma.conference.findMany(); // fetch all conferences
         res.json(conference);
     } catch (error) {
-        console.log({ error: "Failed to fetch conferences" });
+        console.error("Error in /db route:", error);
+        res.status(500).json({ error: "Failed to fetch conferences from server.js" });
     }
 });
 
-// test route
+// root route
 app.get('/', (req, res) => {
-    res.send('Backend server is running 🗿');
+    res.send('Backend server is running 🚀');
 });
 
 // starting server

@@ -7,80 +7,149 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model announcements {
-  ann_id   Int     @id @default(autoincrement())
-  ann_desc String?
-}
-
 model conference {
-  conf_id Int       @id @default(autoincrement())
-  date    DateTime? @db.Date
-  time    DateTime? @db.Time(6)
-  talks   talks[]
+  conference_id Int        @id @default(autoincrement())
+  title         String     @db.VarChar(50)
+  short_name    String     @db.VarChar(20)
+  loca          String     @db.VarChar(100)
+  dates         DateTime   @db.Date
+  website       String?    @db.VarChar(50)
+  logo          String?    @db.VarChar(100)
+  schedule      schedule[]
+  talks         talks[]
+  users         users[]
 }
 
 model flags {
-  flag_id  Int     @id
-  paper_id Int?
-  user_id  Int?
-  papers   papers? @relation(fields: [paper_id], references: [paper_id], onDelete: NoAction, onUpdate: NoAction)
+  flag_id  Int    @id @default(autoincrement())
+  paper_id Int
+  papers   papers @relation(fields: [paper_id], references: [paper_id], onDelete: Cascade, onUpdate: NoAction)
 }
 
 model markers {
-  marker_id   Int      @id @default(autoincrement())
-  description String?
-  papers      papers[]
+  marker_id   Int     @id @default(autoincrement())
+  marker_desc String? @db.VarChar(50)
 }
 
 model own_talks {
-  user_id    Int
-  talk_id    Int
-  is_enabled Boolean?
+  user_id  Int
+  talks_id Int
+  talks    talks @relation(fields: [talks_id], references: [talks_id], onDelete: Cascade, onUpdate: NoAction)
 
-  @@id([user_id, talk_id])
+  @@id([user_id, talks_id])
 }
 
 model papers {
-  paper_id  Int        @id
-  marker_id Int
-  flags     flags[]
-  markers   markers    @relation(fields: [marker_id], references: [marker_id], onDelete: NoAction, onUpdate: NoAction)
-  reminder  reminder[]
-  session   session[]
+  paper_id    Int       @id @default(autoincrement())
+  Abstract    String?
+  Title       String?
+  Description String?
+  Author      String?
+  user_id     Int?
+  flags       flags[]
+  session     session[]
 }
 
 model reminder {
-  rem_id        Int       @id @default(autoincrement())
-  paper_id      Int?
-  user_id       Int?
-  time          DateTime? @db.Timestamp(6)
-  been_reminded Boolean?
-  papers        papers?   @relation(fields: [paper_id], references: [paper_id], onDelete: NoAction, onUpdate: NoAction)
+  reminder_id   Int       @id @default(autoincrement())
+  conference_id Int       @default(autoincrement())
+  title         String?   @db.VarChar(100)
+  Event_time    DateTime? @db.Time(6)
 }
 
 model roles {
-  role_id          Int     @id @default(autoincrement())
-  role_description String?
-  users            users[]
+  role_id   Int     @id @default(autoincrement())
+  role_desc String? @db.VarChar(30)
+  users     users[]
 }
 
 model session {
-  ses_id   Int       @id
-  paper_id Int?
-  date     DateTime? @db.Date
-  time     DateTime? @db.Time(6)
-  papers   papers?   @relation(fields: [paper_id], references: [paper_id], onDelete: NoAction, onUpdate: NoAction)
+  session_id Int    @id @default(autoincrement())
+  paper_id   Int
+  papers     papers @relation(fields: [paper_id], references: [paper_id], onDelete: Cascade, onUpdate: NoAction)
 }
 
 model talks {
-  talk_id    Int         @id @default(autoincrement())
-  conf_id    Int?
-  talk_desc  String?
-  conference conference? @relation(fields: [conf_id], references: [conf_id], onDelete: NoAction, onUpdate: NoAction)
+  talks_id      Int         @id @default(autoincrement())
+  conference_id Int
+  abstract      String      @db.Char(250)
+  authors       String?     @db.Char(30)
+  time_         DateTime?   @db.Time(6)
+  loca          String      @db.VarChar(100)
+  comments      String?     @db.VarChar(250)
+  own_talks     own_talks[]
+  conference    conference  @relation(fields: [conference_id], references: [conference_id], onDelete: Cascade, onUpdate: NoAction)
 }
 
 model users {
-  user_id Int    @id @default(autoincrement())
-  role_id Int?
-  roles   roles? @relation(fields: [role_id], references: [role_id], onDelete: NoAction, onUpdate: NoAction)
+  user_id       Int        @id @default(autoincrement())
+  conference_id Int
+  role_id       Int
+  conference    conference @relation(fields: [conference_id], references: [conference_id], onDelete: Cascade, onUpdate: NoAction)
+  roles         roles      @relation(fields: [role_id], references: [role_id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model Account {
+  id                String    @id
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  auth_user         auth_user @relation(fields: [userId], references: [id])
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String    @id
+  sessionToken String    @unique
+  userId       String
+  expires      DateTime
+  auth_user    auth_user @relation(fields: [userId], references: [id])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model announcement {
+  announcement_id   Int     @id @default(autoincrement())
+  announcement_desc String? @db.VarChar(200)
+}
+
+model auth_user {
+  id            String    @id
+  email         String    @unique
+  name          String?
+  emailVerified DateTime?
+  image         String?
+  role          String    @default("user")
+  Account       Account[]
+  Session       Session[]
+}
+
+model is_enabled {
+  id   Int      @id @default(autoincrement())
+  desc Boolean?
+}
+
+model schedule {
+  schedule_id   Int        @id @default(autoincrement())
+  event_date    DateTime   @db.Date
+  event_time    DateTime   @db.Time(6)
+  title         String     @db.VarChar(30)
+  presentors    String     @db.VarChar(30)
+  conference_id Int
+  conference    conference @relation(fields: [conference_id], references: [conference_id], onDelete: Cascade, onUpdate: NoAction)
 }

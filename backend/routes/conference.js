@@ -6,33 +6,48 @@ const router = express.Router(); // creating router
 // API to fetch list of conferences
 router.get('/list', async (req, res) => {
 
-    // fetch data from database
     try {
-        const conferences = await prisma.conference.findMany();
-        const conferenceData = [...conferences,
+        const conferences = await prisma.conference.findMany({
+          orderBy: [
+            {
+              conference_id: 'asc'
+            }
+          ]
+    });
+        res.json(conferences);
 
-            // test data
-            { conf_id: "N/A", title: "Tech Meeting", 
-                location: "Silvercreek", date: "2030-06-15", time: "3:00pm" },
-            { conf_id: "N/A", title: "World Summit", 
-                location: "New York City", date: "2037-07-20", time: "10:00am" },
-        ];
-        res.json(conferenceData);
     } 
     catch (error) {
-        console.log({ error: "Failed to fetch conferences" });
+      console.error("Error fetching conferences:", error);
+      res.status(500).json({ message: "Failed to fetch conferences from conference.js" });
     }
-    
-});
+  } 
+);
 
 // API to create conference
-router.post('/create', (req, res) => {
-    const { title, location, date } = req.body;
-    if (!title || !location || !date) {
+router.post('/create', async (req, res) => {
+    const { title, short_name, loca, dates } = req.body;
+    if (!title || !short_name || !loca || !dates ) {
         return res.status(400).json({ message: "All fields are required" });
     }
-    res.status(201).json({ message: "Conference created successfully.", data: { title, location, date } });
-});
+
+    try {
+      const newConference = await prisma.conference.create({
+        data: {
+          title,
+          short_name,
+          loca,
+          dates: new Date(dates) // make sure this is a Date object
+        }
+      });
+
+      res.status(201).json({ message: "Conference created successfully.", data: { title, short_name, loca, dates } });
+    } 
+    catch {
+      console.error("Error creating conference:", error);
+      res.status(500).json({ message: "Failed to create conference." });
+    }
+}); 
 
 // export router to use in `server.js`
 module.exports = router;

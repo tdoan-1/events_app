@@ -70,16 +70,7 @@ function Home() {
         <Calendar />
       </div>
       <div className="box upcoming-events">
-        <h3>Upcoming Events</h3>
-        <ul>
-          {conferences.length > 0 ? (
-            conferences.map((event, index) => (
-              <li key={index}>{event.name}</li> // Display each event's name
-            ))
-          ) : (
-            <p>No upcoming events</p> // Display a message if no events are available
-          )}
-        </ul>
+        <EventList /> {/* Display the EventList component */}
       </div>
       <div className="box messages">
         <h3>Messages:</h3>

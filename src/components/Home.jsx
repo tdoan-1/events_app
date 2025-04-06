@@ -19,7 +19,7 @@ function Home() {
 
   return (
     <div>
-      <p>Today's Date: time for you to get a watch(its march 5th)</p>
+      <p>Today's Date: time for you to get a watch {currentDateTime}</p>
       <main>
         <EventList />
         <button onClick={() => console.log("Button clicked!")}>Click me</button>

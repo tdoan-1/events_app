@@ -47,6 +47,7 @@ function EventList() {
           </li>
         ))}            
       </ul>
+      {/*
       <ul>
         {events.map((event, index) => (
           <li key={index}>
@@ -62,6 +63,7 @@ function EventList() {
         onChange={(e) => setNewEvent(e.target.value)} // Update the input value
       />
       <button onClick={handleAddEvent}>Add Event</button>
+      */}
     </div>
   );
 }

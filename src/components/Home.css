@@ -1,0 +1,60 @@
+.home-container {
+    position: relative;
+    height: 100vh; /* Full viewport height */
+    width: 100vw; /* Full viewport width */
+    padding: 20px;
+    box-sizing: border-box;
+    background-color: #d3d3d3; /* Light grey background */
+}
+
+.box {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.upcoming-events {
+    top: 20px;
+    left: 20px;
+    overflow-y: auto; /* Add scroll if there are too many events */
+    max-height: 150px; /* Limit the height of the box */
+}
+
+.messages {
+    top: 20px;
+    right: 20px;
+}
+
+.add-conference {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    width: 250px; /* Adjusted width for this box */
+    height: 150px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.bottom-right {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    font-size: 14px;
+    color: #333;
+}

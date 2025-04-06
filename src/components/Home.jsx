@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import EventList from "./EventList";
-import { useEffect, useState } from "react";
 import { getConferences } from "../api.js";
+import "./Home.css"; // Import the CSS file for styling
 
 function Home() {
   const [currentDateTime, setCurrentDateTime] = useState("");
+  const [conferences, setConferences] = useState([]);
 
+  // Fetch the current date and time
   useEffect(() => {
     const updateDateTime = () => {
       const now = new Date();
@@ -19,23 +21,41 @@ function Home() {
     return () => clearInterval(interval); // Cleanup the interval on component unmount
   }, []);
 
-  // 'setConferences' is the function to update 'conferences'
-    const [conferences, setConferences] = useState([]);
-  
-    //sends request to backend
-    useEffect(() => {
-      getConferences().then((data) => {
-        setConferences(data);
-      });
-    }, []);
+  // Fetch events from the database
+  useEffect(() => {
+    getConferences().then((data) => {
+      setConferences(data); // Store the fetched events in state
+    });
+  }, []);
 
   return (
-    <div>
-      <p>Today's Date: time for you to get a watch(its march 5th)</p>
-      <main>
+    <div className="home-container">
+      <div className="box upcoming-events">
+        <h3>Upcoming Events</h3>
+        <ul>
+          {conferences.length > 0 ? (
+            conferences.map((event, index) => (
+              <li key={index}>{event.name}</li> // Display each event's name
+            ))
+          ) : (
+            <p>No upcoming events</p> // Display a message if no events are available
+          )}
+        </ul>
+      </div>
+      <div className="box messages">
+        <h3>Messages:</h3>
+        <p>Some placeholder messages</p>
+      </div>
+      <div className="box add-conference">
+        <h3>Add Conference via ID</h3>
+        <p>Enter the conference ID to add it to the list.</p>
+      </div>
+      <div className="center">
         <EventList />
-        <button onClick={handleClick}>Click me</button>
-      </main>
+      </div>
+      <div className="bottom-right">
+        <p>{currentDateTime}</p>
+      </div>
     </div>
   );
 }

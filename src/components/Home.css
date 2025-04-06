@@ -58,3 +58,64 @@
     font-size: 14px;
     color: #333;
 }
+
+.calendar-container {
+    position: absolute;
+    top: 300px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 500px; /* Set the width of the calendar box */
+    height: auto; /* Adjust height dynamically based on content */
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.calendar-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #333;
+}
+
+.calendar-header button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.calendar-header button:hover {
+    background-color: #0056b3;
+}
+
+.days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr); /* 7 days per week */
+    gap: 5px;
+}
+
+.day {
+    text-align: center;
+    padding: 5px;
+    background-color: #eaeaea;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.day:hover {
+    background-color: #d3d3d3;
+    cursor: pointer;
+}

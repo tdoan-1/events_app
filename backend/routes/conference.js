@@ -27,20 +27,25 @@ router.get('/list', async (req, res) => {
 // API to fetch a conference by ID
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
+  const parsedId = parseInt(id, 10);
+
+  if (isNaN(parsedId)) {
+    return res.status(400).json({ message: "Invalid conference ID." });
+  }
 
   try {
-      const conference = await prisma.conference.findUnique({
-          where: { conference_id: parseInt(id) }, // Ensure ID is parsed as an integer
-      });
+    const conference = await prisma.conference.findUnique({
+      where: { conference_id: parsedId },
+    });
 
-      if (!conference) {
-          return res.status(404).json({ message: "Conference not found" });
-      }
+    if (!conference) {
+      return res.status(404).json({ message: "Conference not found." });
+    }
 
-      res.json(conference);
+    res.json(conference);
   } catch (error) {
-      console.error("Error fetching conference by ID:", error);
-      res.status(500).json({ message: "Failed to fetch conference." });
+    console.error("Error fetching conference by ID:", error);
+    res.status(500).json({ message: "Failed to fetch conference." });
   }
 });
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getConferences } from "../api.js";
 import EventList from "./EventList.jsx";
+import TalkList from "./TalkList.jsx";
 import "./Home.css";
 
 function Calendar() {
@@ -45,6 +46,8 @@ function Home() {
   const [currentDateTime, setCurrentDateTime] = useState("");
   const [conferences, setConferences] = useState([]);
   const [conferenceId, setConferenceId] = useState("");
+  const [talks, setTalks] = useState([]);
+  const [flaggedTalks, setFlaggedTalks] = useState([]);
 
   useEffect(() => {
     const updateDateTime = () => {
@@ -57,10 +60,28 @@ function Home() {
     return () => clearInterval(interval);
   }, []);
 
+  // Fetch conferences from the backend
   useEffect(() => {
     getConferences().then((data) => {
       setConferences(data);
     });
+  }, []);
+
+  // Fetch talks from the backend
+  useEffect(() => {
+    fetch(`http://localhost:5000/api/talk/list`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to fetch talks");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setTalks(data); // Store talks in state
+      })
+      .catch((error) => {
+        console.error("Error fetching talks:", error);
+      });
   }, []);
 
   const handleAddConference = () => {
@@ -99,6 +120,12 @@ function Home() {
     );
   };
 
+  const handleFlagTalk = (talkId) => {
+    setFlaggedTalks((prev) =>
+      prev.includes(talkId) ? prev.filter((id) => id !== talkId) : [...prev, talkId]
+    );
+  };
+
   return (
     <div className="home-container">
       <div className="box calendar-container">
@@ -106,8 +133,8 @@ function Home() {
       </div>
 
       <div className="box messages">
-        <h3>Messages:</h3>
-        <p>Some placeholder messages</p>
+        <h3>Messages</h3>
+        <p>No messages at this time.</p>
       </div>
 
       <div className="box upcoming-conferences">
@@ -131,6 +158,14 @@ function Home() {
       <div className="bottom-right">
         <p>{currentDateTime}</p>
       </div>
+
+      <div className="box upcoming-talks">
+        <TalkList talks={talks}
+        onFlag={handleFlagTalk}
+        flaggedTalks={flaggedTalks} // Pass flaggedTalks to TalkList
+        />
+      </div>
+
     </div>
   );
 }

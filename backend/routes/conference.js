@@ -24,6 +24,26 @@ router.get('/list', async (req, res) => {
   } 
 );
 
+// API to fetch a conference by ID
+router.get('/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+      const conference = await prisma.conference.findUnique({
+          where: { conference_id: parseInt(id) }, // Ensure ID is parsed as an integer
+      });
+
+      if (!conference) {
+          return res.status(404).json({ message: "Conference not found" });
+      }
+
+      res.json(conference);
+  } catch (error) {
+      console.error("Error fetching conference by ID:", error);
+      res.status(500).json({ message: "Failed to fetch conference." });
+  }
+});
+
 // API to create conference
 router.post('/create', async (req, res) => {
     const { title, short_name, loca, dates } = req.body;

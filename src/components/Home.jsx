@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { getConferences } from "../api.js";
-import "./Home.css"; // Import the CSS file for styling
+import EventList from "./EventList.jsx";
+import TalkList from "./TalkList.jsx";
+import "./Home.css";
 
 function Calendar() {
   const months = [
@@ -8,18 +10,18 @@ function Calendar() {
     "July", "August", "September", "October", "November", "December"
   ];
 
-  const [currentMonth, setCurrentMonth] = useState(0); // State to track the current month
+  const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
 
   const getDaysInMonth = (year, month) => {
     return new Date(year, month + 1, 0).getDate();
   };
 
   const handlePrevMonth = () => {
-    setCurrentMonth((prev) => (prev === 0 ? 11 : prev - 1)); // Go to the previous month
+    setCurrentMonth((prev) => (prev === 0 ? 11 : prev - 1));
   };
 
   const handleNextMonth = () => {
-    setCurrentMonth((prev) => (prev === 11 ? 0 : prev + 1)); // Go to the next month
+    setCurrentMonth((prev) => (prev === 11 ? 0 : prev + 1));
   };
 
   return (
@@ -43,35 +45,54 @@ function Calendar() {
 function Home() {
   const [currentDateTime, setCurrentDateTime] = useState("");
   const [conferences, setConferences] = useState([]);
-  const [conferenceId, setConferenceId] = useState(""); // State to track the entered conference ID
+  const [conferenceId, setConferenceId] = useState("");
+  const [talks, setTalks] = useState([]);
+  const [flaggedTalks, setFlaggedTalks] = useState([]);
 
   useEffect(() => {
     const updateDateTime = () => {
       const now = new Date();
-      const formattedDateTime = now.toLocaleString(); // Format the date and time
-      setCurrentDateTime(formattedDateTime);
+      setCurrentDateTime(now.toLocaleString());
     };
 
-    updateDateTime(); // Set the initial date and time
-    const interval = setInterval(updateDateTime, 1000); // Update every second
-
-    return () => clearInterval(interval); // Cleanup the interval on component unmount
+    updateDateTime();
+    const interval = setInterval(updateDateTime, 1000);
+    return () => clearInterval(interval);
   }, []);
 
+  // Fetch conferences from the backend
   useEffect(() => {
     getConferences().then((data) => {
-      setConferences(data); // Store the fetched events in state
+      setConferences(data);
     });
   }, []);
 
+  // Fetch talks from the backend
+  useEffect(() => {
+    fetch(`http://localhost:5000/api/talk/list`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to fetch talks");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setTalks(data); // Store talks in state
+      })
+      .catch((error) => {
+        console.error("Error fetching talks:", error);
+      });
+  }, []);
+
   const handleAddConference = () => {
-    if (!conferenceId) {
+
+    console.log("Adding conference with ID:", conferenceId);
+
+    if (!conferenceId.trim()) {
       alert("Please enter a valid conference ID.");
       return;
     }
-
-    // Fetch conference details by ID
-    fetch(`/api/conferences/${conferenceId}`)
+    fetch(`http://localhost:5000/api/conference/${conferenceId}`)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Conference not found");
@@ -79,8 +100,13 @@ function Home() {
         return response.json();
       })
       .then((conference) => {
-        setConferences((prevConferences) => [...prevConferences, conference]); // Add the new conference to the list
-        setConferenceId(""); // Clear the input field
+        if (conferences.some((c) => c.conference_id === conference.conference_id)) {
+          alert("Conference is already in the list.");
+          return;
+        }
+
+        setConferences((prev) => [...prev, conference]);
+        setConferenceId("");
       })
       .catch((error) => {
         console.error("Error adding conference:", error);
@@ -88,27 +114,36 @@ function Home() {
       });
   };
 
+  const handleDeleteConference = (conferenceIdToDelete) => {
+    setConferences((prev) =>
+      prev.filter((conf) => conf.conference_id !== conferenceIdToDelete)
+    );
+  };
+
+  const handleFlagTalk = (talkId) => {
+    setFlaggedTalks((prev) =>
+      prev.includes(talkId) ? prev.filter((id) => id !== talkId) : [...prev, talkId]
+    );
+  };
+
   return (
     <div className="home-container">
       <div className="box calendar-container">
         <Calendar />
       </div>
-      <div className="box upcoming-events">
-        <h3>Upcoming Events</h3>
-        <ul>
-          {conferences.length > 0 ? (
-            conferences.map((event, index) => (
-              <li key={index}>{event.name}</li> // Display each event's name
-            ))
-          ) : (
-            <p>No upcoming events</p> // Display a message if no events are available
-          )}
-        </ul>
-      </div>
+
       <div className="box messages">
-        <h3>Messages:</h3>
-        <p>Some placeholder messages</p>
+        <h3>Messages</h3>
+        <p>No messages at this time.</p>
       </div>
+
+      <div className="box upcoming-conferences">
+        <EventList
+          conferences={conferences}
+          onDelete={handleDeleteConference}
+        />
+      </div>
+
       <div className="box add-conference">
         <h3>Add Conference via ID</h3>
         <p>Enter the conference ID to add it to the list.</p>
@@ -120,10 +155,17 @@ function Home() {
         />
         <button onClick={handleAddConference}>Add Conference</button>
       </div>
-      
       <div className="bottom-right">
         <p>{currentDateTime}</p>
       </div>
+
+      <div className="box upcoming-talks">
+        <TalkList talks={talks}
+        onFlag={handleFlagTalk}
+        flaggedTalks={flaggedTalks} // Pass flaggedTalks to TalkList
+        />
+      </div>
+
     </div>
   );
 }

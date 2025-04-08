@@ -6,8 +6,14 @@ const prisma = new PrismaClient();  // instantiate PrismaClient
 const app = express();
 app.use(cors());  // enable CORS
 app.use(express.json());  // allow JSON request bodies
-const conferenceRoutes = require('./routes/conference'); // import routes
-app.use('/api/conference', conferenceRoutes); // use the routes
+
+// Import routes
+const conferenceRoutes = require('./routes/conference'); // import conference routes
+const talkRoutes = require('./routes/talk'); // import talk routes
+
+// Use the routes
+app.use('/api/conference', conferenceRoutes); // use conference routes
+app.use('/api/talk', talkRoutes); // use talk routes
 
 // route for database
 app.get('/db', async (req, res) => {

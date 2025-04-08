@@ -21,8 +21,11 @@
 .upcoming-events {
     top: 20px;
     left: 20px;
+    width: 300px;
+    height: 400px; 
+    overflow-y: auto;
+    padding: 10px;
     overflow-y: auto; /* Add scroll if there are too many events */
-    max-height: 150px; /* Limit the height of the box */
 }
 
 .messages {
@@ -34,13 +37,14 @@
     position: absolute;
     bottom: 20px;
     left: 20px;
-    width: 250px; /* Adjusted width for this box */
+    width: 300px; /* Adjusted width for this box */
     height: 150px;
     background-color: #f0f0f0;
     border: 1px solid #ccc;
     border-radius: 8px;
     padding: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    h3{ font-size: 25px;}
 }
 
 .center {

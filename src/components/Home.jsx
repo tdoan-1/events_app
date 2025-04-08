@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import EventList from "./EventList";
 import { getConferences } from "../api.js";
 import "./Home.css"; // Import the CSS file for styling
 
@@ -44,6 +43,7 @@ function Calendar() {
 function Home() {
   const [currentDateTime, setCurrentDateTime] = useState("");
   const [conferences, setConferences] = useState([]);
+  const [conferenceId, setConferenceId] = useState(""); // State to track the entered conference ID
 
   useEffect(() => {
     const updateDateTime = () => {
@@ -64,17 +64,42 @@ function Home() {
     });
   }, []);
 
+  const handleAddConference = () => {
+    if (!conferenceId) {
+      alert("Please enter a valid conference ID.");
+      return;
+    }
+
+    // Fetch conference details by ID
+    fetch(`/api/conferences/${conferenceId}`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Conference not found");
+        }
+        return response.json();
+      })
+      .then((conference) => {
+        setConferences((prevConferences) => [...prevConferences, conference]); // Add the new conference to the list
+        setConferenceId(""); // Clear the input field
+      })
+      .catch((error) => {
+        console.error("Error adding conference:", error);
+        alert("Failed to add conference. Please try again.");
+      });
+  };
+
   return (
     <div className="home-container">
       <div className="box calendar-container">
         <Calendar />
       </div>
-      <div className="box upcoming-events">
-        <h3>Upcoming Events</h3>
+      <div className="box upcoming-events"> 
+        
+        <h3>Upcoming Events</h3>  {/* Display the list of upcoming events */}
         <ul>
           {conferences.length > 0 ? (
             conferences.map((event, index) => (
-              <li key={index}>{event.name}</li> // Display each event's name
+              <li key={index}>{event.name}</li> 
             ))
           ) : (
             <p>No upcoming events</p> // Display a message if no events are available
@@ -88,6 +113,13 @@ function Home() {
       <div className="box add-conference">
         <h3>Add Conference via ID</h3>
         <p>Enter the conference ID to add it to the list.</p>
+        <input
+          type="text"
+          value={conferenceId}
+          onChange={(e) => setConferenceId(e.target.value)}
+          placeholder="Conference ID"
+        />
+        <button onClick={handleAddConference}>Add Conference</button>
       </div>
       
       <div className="bottom-right">

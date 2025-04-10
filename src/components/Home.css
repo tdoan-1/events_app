@@ -143,6 +143,7 @@ body, html {
 }
 
 .upcoming-talks {
+    top: 20px;
     right: 40px;
     width: 310px;
     height: 400px;

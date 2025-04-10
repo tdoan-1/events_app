@@ -19,7 +19,7 @@ function TalkList({ talks, onFlag, flaggedTalks }) {
               <p>Location: {talk.loca}</p>
               <p>Time: {talk.time_ ? new Date(talk.time_).toLocaleString("en-US") : "N/A"}</p>
               <button onClick={() => onFlag(talk.talks_id)}>
-                {flaggedTalks.includes(talk.talks_id) ? "Unflag" : "Flag"}
+                {flaggedTalks.includes(talk.talks_id) ? "Unflag Talk" : "Flag Talk"}
                 </button>
             </li>
           ))}

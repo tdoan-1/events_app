@@ -90,7 +90,7 @@ model users {
 }
 
 model Account {
-  id                String    @id
+  id                String  @id
   userId            String
   type              String
   provider          String
@@ -102,17 +102,17 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
-  auth_user         auth_user @relation(fields: [userId], references: [id])
+  auth_user         User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
 
 model Session {
-  id           String    @id
-  sessionToken String    @unique
+  id           String   @id
+  sessionToken String   @unique
   userId       String
   expires      DateTime
-  auth_user    auth_user @relation(fields: [userId], references: [id])
+  auth_user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model VerificationToken {
@@ -128,17 +128,6 @@ model announcement {
   announcement_desc String? @db.VarChar(200)
 }
 
-model auth_user {
-  id            String    @id
-  email         String    @unique
-  name          String?
-  emailVerified DateTime?
-  image         String?
-  role          String    @default("user")
-  Account       Account[]
-  Session       Session[]
-}
-
 model is_enabled {
   id   Int      @id @default(autoincrement())
   desc Boolean?
@@ -152,4 +141,26 @@ model schedule {
   presentors    String     @db.VarChar(30)
   conference_id Int
   conference    conference @relation(fields: [conference_id], references: [conference_id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model User {
+  id            String    @id
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  role          String    @default("user")
+  Account       Account[]
+  Session       Session[]
+}
+
+model VerificationCode {
+  id        String   @id
+  email     String
+  code      String
+  expires   DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([email, code])
 }

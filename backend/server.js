@@ -1,27 +1,34 @@
 require('dotenv').config(); // Loads configuration values from .env
 console.log("✅ DATABASE_URL loaded as:", process.env.DATABASE_URL);
 
-const express = require('express');  // Import Express
-const cors = require('cors');  // Allows frontend to connect
+const express = require('express');           // Import Express
+const cors = require('cors');                 // Allows frontend to connect
 const { PrismaClient } = require('@prisma/client');  // Import PrismaClient
-const prisma = new PrismaClient();  // Instantiate PrismaClient
+const prisma = new PrismaClient();            // Instantiate PrismaClient
 
 const app = express();
-app.use(cors());  // Enable CORS
-app.use(express.json());  // Allow JSON request bodies
 
-// Import routes
-const conferenceRoutes = require('./routes/conference'); // Import conference routes
-const talkRoutes = require('./routes/talk'); // Import talk routes
+// ✅ CORS setup (only allow frontend URL during dev)
+app.use(cors({ origin: 'http://localhost:5173' }));
 
-// Use the routes
-app.use('/api/conference', conferenceRoutes); // Use conference routes
-app.use('/api/talk', talkRoutes); // Use talk routes
+// ✅ Allow JSON request bodies
+app.use(express.json());
 
-// Route for database
+// ✅ Import routes
+const conferenceRoutes = require('./routes/conference');
+const talkRoutes = require('./routes/talk');
+const authRoutes = require('./routes/auth');
+app.use('/api', authRoutes);
+
+// ✅ Mount routes
+app.use('/api/conference', conferenceRoutes);
+app.use('/api/talk', talkRoutes);
+app.use('/api', authRoutes); // <-- Handles /send-code and /verify-code
+
+// ✅ Test route to confirm DB connection
 app.get('/db', async (req, res) => {
   try {
-    const conference = await prisma.conference.findMany(); // Fetch all conferences
+    const conference = await prisma.conference.findMany();
     res.json(conference);
   } catch (error) {
     console.error("Error in /db route:", error);
@@ -29,17 +36,17 @@ app.get('/db', async (req, res) => {
   }
 });
 
-// Root route
+// ✅ Root route
 app.get('/', (req, res) => {
   res.send('Backend server is running 🚀');
 });
 
-// Start server after connecting to the database
+// ✅ Server setup
 const PORT = process.env.PORT || 5000;
 
 async function startServer() {
   try {
-    await prisma.$connect(); // Connect to the database
+    await prisma.$connect();
     console.log("✅ Successfully connected to Prisma DB");
 
     app.listen(PORT, () => {
@@ -47,8 +54,8 @@ async function startServer() {
     });
   } catch (err) {
     console.error("❌ Prisma DB connection failed:", err);
-    process.exit(1); // Exit if DB connection fails
+    process.exit(1);
   }
 }
 
-startServer(); // Kick off the server
+startServer(); // 🚀 Launch server

@@ -1,19 +1,57 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
-import './MainMenu.css'; // Import the CSS file
+import { useNavigate } from "react-router-dom";
+import './MainMenu.css';
 
 function MainMenu() {
-  const [email, setEmail] = useState(""); // State to store the entered email
-  const navigate = useNavigate(); // Initialize useNavigate
+  const [email, setEmail] = useState("");
+  const [code, setCode] = useState("");
+  const [isCodeSent, setIsCodeSent] = useState(false);
+  const navigate = useNavigate();
 
-  const handleLogin = () => {
-    if (email.trim() !== "") {
-      console.log(`Email entered: ${email}`);
-      // Add logic to handle login (e.g., send email to backend)
-      setEmail(""); // Clear the input field
-      navigate("/home"); // Navigate to the Home Menu
+  const validateEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
+  const handleSendCode = async () => {
+    if (validateEmail(email)) {
+      try {
+        const response = await fetch("/api/send-code", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        });
+        if (response.ok) {
+          setIsCodeSent(true);
+          alert("Verification code sent to your email!");
+        } else {
+          alert("Failed to send code. Please try again.");
+        }
+      } catch (error) {
+        console.error("Error sending code:", error);
+        alert("An error occurred. Please try again.");
+      }
     } else {
       alert("Please enter a valid email address.");
+    }
+  };
+
+  const handleVerifyCode = async () => {
+    try {
+      const response = await fetch("/api/verify-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, code }),
+      });
+      if (response.ok) {
+        alert("Login successful!");
+        navigate("/home");
+      } else {
+        alert("Invalid code. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error verifying code:", error);
+      alert("An error occurred. Please try again.");
     }
   };
 
@@ -21,13 +59,27 @@ function MainMenu() {
     <div className="main-menu">
       <h1>Welcome</h1>
       <div className="login-container">
-        <input
-          type="email"
-          placeholder="Enter your email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)} // Update the email state
-        />
-        <button onClick={handleLogin}>Enter</button>
+        {!isCodeSent ? (
+          <>
+            <input
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <button onClick={handleSendCode}>Send Code</button>
+          </>
+        ) : (
+          <>
+            <input
+              type="text"
+              placeholder="Enter the verification code"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+            />
+            <button onClick={handleVerifyCode}>Verify Code</button>
+          </>
+        )}
       </div>
     </div>
   );

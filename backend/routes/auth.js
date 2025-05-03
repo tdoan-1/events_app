@@ -1,12 +1,14 @@
+// backend/routes/auth.js
 const express = require("express");
 const nodemailer = require("nodemailer");
 const router = express.Router();
+require("dotenv").config();
 
-const codes = new Map(); // Temporary in-memory store for codes
+const codes = new Map();
 
 router.post("/send-code", async (req, res) => {
   const { email } = req.body;
-  const code = Math.floor(100000 + Math.random() * 900000).toString(); // Generate 6-digit code
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
   codes.set(email, code);
 
   const transporter = nodemailer.createTransport({
@@ -26,9 +28,10 @@ router.post("/send-code", async (req, res) => {
 
   try {
     await transporter.sendMail(mailOptions);
+    console.log(`✅ Code sent to ${email}: ${code}`);
     res.status(200).send("Code sent successfully.");
   } catch (error) {
-    console.error("Error sending email:", error);
+    console.error("❌ Error sending email:", error);
     res.status(500).send("Failed to send code.");
   }
 });
@@ -38,7 +41,7 @@ router.post("/verify-code", (req, res) => {
   const storedCode = codes.get(email);
 
   if (storedCode === code) {
-    codes.delete(email); // Remove the code after successful verification
+    codes.delete(email);
     res.status(200).send("Code verified successfully.");
   } else {
     res.status(400).send("Invalid code.");

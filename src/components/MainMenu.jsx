@@ -6,6 +6,8 @@ function MainMenu() {
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [isCodeSent, setIsCodeSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
   const validateEmail = (email) => {
@@ -14,44 +16,55 @@ function MainMenu() {
   };
 
   const handleSendCode = async () => {
-    if (validateEmail(email)) {
-      try {
-        const response = await fetch("/api/send-code", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email }),
-        });
-        if (response.ok) {
-          setIsCodeSent(true);
-          alert("Verification code sent to your email!");
-        } else {
-          alert("Failed to send code. Please try again.");
-        }
-      } catch (error) {
-        console.error("Error sending code:", error);
-        alert("An error occurred. Please try again.");
+    if (!validateEmail(email)) {
+      setMessage("Please enter a valid email address.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setMessage("");
+      const response = await fetch("http://localhost:5000/api/send-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      if (response.ok) {
+        setIsCodeSent(true);
+        setMessage("Verification code sent to your email!");
+      } else {
+        setMessage("Failed to send code. Please try again.");
       }
-    } else {
-      alert("Please enter a valid email address.");
+    } catch (error) {
+      console.error("Error sending code:", error);
+      setMessage("An error occurred. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleVerifyCode = async () => {
     try {
-      const response = await fetch("/api/verify-code", {
+      setLoading(true);
+      setMessage("");
+      const response = await fetch("http://localhost:5000/api/verify-code", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, code }),
       });
+
       if (response.ok) {
-        alert("Login successful!");
+        setMessage("Login successful!");
         navigate("/home");
       } else {
-        alert("Invalid code. Please try again.");
+        setMessage("Invalid code. Please try again.");
       }
     } catch (error) {
       console.error("Error verifying code:", error);
-      alert("An error occurred. Please try again.");
+      setMessage("An error occurred. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -66,8 +79,11 @@ function MainMenu() {
               placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              disabled={loading}
             />
-            <button onClick={handleSendCode}>Send Code</button>
+            <button onClick={handleSendCode} disabled={loading}>
+              {loading ? "Sending..." : "Send Code"}
+            </button>
           </>
         ) : (
           <>
@@ -76,10 +92,14 @@ function MainMenu() {
               placeholder="Enter the verification code"
               value={code}
               onChange={(e) => setCode(e.target.value)}
+              disabled={loading}
             />
-            <button onClick={handleVerifyCode}>Verify Code</button>
+            <button onClick={handleVerifyCode} disabled={loading}>
+              {loading ? "Verifying..." : "Verify Code"}
+            </button>
           </>
         )}
+        {message && <p>{message}</p>}
       </div>
     </div>
   );

@@ -59,19 +59,19 @@ body, html {
   background-color: #f9f9f9;
 }
 
-/* Center Calendar */
 .calendar-container {
-  grid-column: 2; /* Place in the center column */
-  grid-row: 1; /* Place in the first row */
-  flex: 1;
-  max-width: 700px;
-  text-align: center;
-  background-color: #ffffff;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-  margin: 0 auto; /* Center the calendar horizontally */
-}
+    grid-column: 2;       /* Still in center column */
+    grid-row: 1;          /* First row */
+    max-width: 700px;
+    text-align: center;
+    background-color: #ffffff;
+    padding: 20px;        /* Reduced from 30px */
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    margin: 0 auto;       /* Horizontal centering only */
+    margin-bottom: 0;
+  }
+  
 
 /* Right Panel */
 .upcoming-talks {
@@ -89,16 +89,17 @@ body, html {
 /* Messages Box */
 .messages {
   grid-column: 2; /* Align directly below the calendar */
-  grid-row: 2; /* Place in the second row */
-  align-self: start; /* Align to the top of the row */
+  grid-row: 1; /* Place in the second row */
+  align-self: end; /* Align to the top of the row */
+  transform: translateY(30%);
   width: auto; /* Adjust width to fit the new position */
   min-height: 200px;
-  padding: 20px;
+  padding: 0px;
   background-color: #ffffff;
   border-radius: 12px;
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
   text-align: center;
-  margin-top: 5px; /* Reduced margin to move the box slightly up */
+  margin-top: 0px; /* Reduced margin to move the box slightly up */
 }
 
 /* Calendar Header */

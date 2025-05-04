@@ -24,7 +24,6 @@ function TalkList({ talks, onFlag, flaggedTalks }) {
     <div>
       <h3>Upcoming Talks</h3>
 
-      {/* Header with Search and Create Button */}
       <div className="talk-header">
         <input
           type="text"
@@ -38,9 +37,9 @@ function TalkList({ talks, onFlag, flaggedTalks }) {
       {filteredTalks.length === 0 ? (
         <p>No talks found.</p>
       ) : (
-        <ul>
+        <ul className="talk-list">
           {filteredTalks.map((talk, index) => (
-            <li key={index}>
+            <li key={index} className="talk-item">
               <h4>
                 Talk ID: {talk.talks_id}{" "}
                 {flaggedTalks.includes(talk.talks_id) && "🚩"}{" "}
@@ -55,16 +54,18 @@ function TalkList({ talks, onFlag, flaggedTalks }) {
                   ? new Date(talk.time_).toLocaleString("en-US")
                   : "N/A"}
               </p>
-              <button onClick={() => onFlag(talk.talks_id)}>
-                {flaggedTalks.includes(talk.talks_id)
-                  ? "Unflag Talk"
-                  : "Flag Talk"}
-              </button>
-              <button onClick={() => handleImportant(talk.talks_id)}>
-                {importantTalks.includes(talk.talks_id)
-                  ? "Unmark Important"
-                  : "Mark Important"}
-              </button>
+              <div className="button-row">
+                <button onClick={() => onFlag(talk.talks_id)}>
+                  {flaggedTalks.includes(talk.talks_id)
+                    ? "Unflag Talk"
+                    : "Flag Talk"}
+                </button>
+                <button onClick={() => handleImportant(talk.talks_id)}>
+                  {importantTalks.includes(talk.talks_id)
+                    ? "Unmark Important"
+                    : "Mark Important"}
+                </button>
+              </div>
             </li>
           ))}
         </ul>

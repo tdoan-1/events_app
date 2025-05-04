@@ -33,7 +33,7 @@ function EventList({ conferences, onDelete }) {
               <p>Location: {conference.loca}</p>
               <p>Dates: {new Date(conference.dates).toLocaleString("en-US")}</p>
               <button onClick={() => onDelete(conference.conference_id)}>
-                Delete
+                Unsubscribe
               </button>
             </li>
           ))}

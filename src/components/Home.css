@@ -14,7 +14,6 @@ body, html {
   }
   
   .box {
-    position: absolute;
     background-color: #f0f0f0;
     border: 1px solid #ccc;
     border-radius: 8px;
@@ -22,25 +21,29 @@ body, html {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
   
-  /* Left side */
-  .upcoming-conferences {
+  /* Left side container for stacking */
+  .left-panel {
+    position: absolute;
     top: 20px;
     left: 20px;
     width: 300px;
-    height: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .upcoming-conferences {
+    height: 300px;
     overflow-y: auto;
   }
   
   .add-conference {
-    bottom: 0px;
-    left: 20px;
-    width: 300px;
     height: auto;
-    padding-bottom: 20px;
   }
   
   /* Center calendar */
   .calendar-container {
+    position: absolute;
     top: 20px;
     left: 50%;
     transform: translateX(-50%);
@@ -50,15 +53,17 @@ body, html {
   
   /* Right side */
   .upcoming-talks {
+    position: absolute;
     top: 20px;
     right: 35px;
     width: 320px;
-    height: 400px;
+    height: 450px;
     overflow-y: auto;
   }
   
   /* Messages */
   .messages {
+    position: absolute;
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
@@ -127,7 +132,8 @@ body, html {
     font-size: 20px;
     font-weight: bold;
   }
-
+  
   h4 {
     font-size: 15px;
   }
+  

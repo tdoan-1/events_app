@@ -55,8 +55,21 @@ function MainMenu() {
       });
 
       if (response.ok) {
-        setMessage("Login successful!");
-        navigate("/home");
+        // Create or retrieve user
+        const userRes = await fetch("http://localhost:5000/api/user/login-or-create", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        });
+
+        if (userRes.ok) {
+          const userData = await userRes.json();
+          localStorage.setItem("user", JSON.stringify(userData.user));
+          setMessage("Login successful!");
+          window.location.href = "/home";
+        } else {
+          setMessage("Failed to load user data.");
+        }
       } else {
         setMessage("Invalid code. Please try again.");
       }

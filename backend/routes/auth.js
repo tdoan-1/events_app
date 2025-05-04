@@ -1,6 +1,9 @@
 // backend/routes/auth.js
 const express = require("express");
 const nodemailer = require("nodemailer");
+const { PrismaClient } = require("@prisma/client");
+const { v4: uuidv4 } = require("uuid"); // ✅ Add this
+const prisma = new PrismaClient();
 const router = express.Router();
 require("dotenv").config();
 
@@ -45,6 +48,34 @@ router.post("/verify-code", (req, res) => {
     res.status(200).send("Code verified successfully.");
   } else {
     res.status(400).send("Invalid code.");
+  }
+});
+
+// ✅ POST /api/user/login-or-create
+router.post('/user/login-or-create', async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    // Try to find the user by email
+    let user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    // If not found, create the user
+    if (!user) {
+      user = await prisma.user.create({
+        data: {
+          id: uuidv4(),                // ✅ Generate unique UUID
+          email,
+          name: email.split("@")[0],  // Optional name from email
+        },
+      });
+    }
+
+    res.status(200).json({ user });
+  } catch (error) {
+    console.error("Error accessing/creating user:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 

@@ -1,35 +1,35 @@
 require('dotenv').config(); // Loads configuration values from .env
 console.log("✅ DATABASE_URL loaded as:", process.env.DATABASE_URL);
 
-const express = require('express');           // Import Express
-const cors = require('cors');                 // Allows frontend to connect
-const { PrismaClient } = require('@prisma/client');  // Import PrismaClient
-const prisma = new PrismaClient();            // Instantiate PrismaClient
+const express = require('express');
+const cors = require('cors');
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
 
 const app = express();
 
-// ✅ CORS setup (only allow frontend URL during dev)
+// ✅ Middleware
 app.use(cors({ origin: 'http://localhost:5173' }));
-
-// ✅ Allow JSON request bodies
 app.use(express.json());
 
-// ✅ Import routes
+// ✅ Route imports
 const conferenceRoutes = require('./routes/conference');
 const talkRoutes = require('./routes/talk');
 const authRoutes = require('./routes/auth');
-app.use('/api', authRoutes);
+const userRoutes = require('./routes/user');
 
-// ✅ Mount routes
+// ✅ Route mounting
 app.use('/api/conference', conferenceRoutes);
 app.use('/api/talk', talkRoutes);
-app.use('/api', authRoutes); // <-- Handles /send-code and /verify-code
+app.use('/api', authRoutes);
+app.use('/api', userRoutes); // mount at /api/user-id
 
-// ✅ Test route to confirm DB connection
+
+// ✅ Test DB connection
 app.get('/db', async (req, res) => {
   try {
-    const conference = await prisma.conference.findMany();
-    res.json(conference);
+    const conferences = await prisma.conference.findMany();
+    res.json(conferences);
   } catch (error) {
     console.error("Error in /db route:", error);
     res.status(500).json({ error: "Failed to fetch conferences from server.js" });
@@ -41,7 +41,7 @@ app.get('/', (req, res) => {
   res.send('Backend server is running 🚀');
 });
 
-// ✅ Server setup
+// ✅ Start server
 const PORT = process.env.PORT || 5000;
 
 async function startServer() {
@@ -58,4 +58,4 @@ async function startServer() {
   }
 }
 
-startServer(); // 🚀 Launch server
+startServer();

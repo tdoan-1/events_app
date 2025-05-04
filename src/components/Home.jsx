@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { getConferences } from "../api.js";
 import EventList from "./EventList.jsx";
 import TalkList from "./TalkList.jsx";
+import CreateConference from "./CreateConference.jsx";
+import CreateTalk from "./CreateTalk.jsx";
 import "./Home.css";
 
 function Calendar() {
@@ -45,7 +47,7 @@ function Calendar() {
 function Home() {
   const [currentDateTime, setCurrentDateTime] = useState("");
   const [conferences, setConferences] = useState([]);
-  const [conferenceId, setConferenceId] = useState("");
+  const [conferenceTitle, setConferenceTitle] = useState("");
   const [talks, setTalks] = useState([]);
   const [flaggedTalks, setFlaggedTalks] = useState([]);
 
@@ -60,14 +62,12 @@ function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  // Fetch conferences from the backend
   useEffect(() => {
     getConferences().then((data) => {
       setConferences(data);
     });
   }, []);
 
-  // Fetch talks from the backend
   useEffect(() => {
     fetch(`http://localhost:5000/api/talk/list`)
       .then((response) => {
@@ -77,7 +77,7 @@ function Home() {
         return response.json();
       })
       .then((data) => {
-        setTalks(data); // Store talks in state
+        setTalks(data);
       })
       .catch((error) => {
         console.error("Error fetching talks:", error);
@@ -85,31 +85,33 @@ function Home() {
   }, []);
 
   const handleAddConference = () => {
-
-    console.log("Adding conference with ID:", conferenceId);
-
-    if (!conferenceId.trim()) {
-      alert("Please enter a valid conference ID.");
+    if (!conferenceTitle.trim()) {
+      alert("Please enter a valid conference title.");
       return;
     }
-    fetch(`http://localhost:5000/api/conference/${conferenceId}`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Conference not found");
+
+    fetch(`http://localhost:5000/api/conference/list`)
+      .then((response) => response.json())
+      .then((allConfs) => {
+        const match = allConfs.find(
+          (conf) => conf.title.toLowerCase() === conferenceTitle.toLowerCase()
+        );
+
+        if (!match) {
+          alert("Conference title not found.");
+          return;
         }
-        return response.json();
-      })
-      .then((conference) => {
-        if (conferences.some((c) => c.conference_id === conference.conference_id)) {
+
+        if (conferences.some((c) => c.conference_id === match.conference_id)) {
           alert("Conference is already in the list.");
           return;
         }
 
-        setConferences((prev) => [...prev, conference]);
-        setConferenceId("");
+        setConferences((prev) => [...prev, match]);
+        setConferenceTitle("");
       })
       .catch((error) => {
-        console.error("Error adding conference:", error);
+        console.error("Error searching conference by title:", error);
         alert("Failed to add conference. Please try again.");
       });
   };
@@ -128,6 +130,28 @@ function Home() {
 
   return (
     <div className="home-container">
+      <div className="left-panel">
+        <div className="box upcoming-conferences">
+          <EventList
+            conferences={conferences}
+            onDelete={handleDeleteConference}
+          />
+        </div>
+
+        <div className="box add-conference">
+          <h3>Add Conference by Title</h3>
+          <input
+            type="text"
+            value={conferenceTitle}
+            onChange={(e) => setConferenceTitle(e.target.value)}
+            placeholder="Conference Title"
+          />
+          <button onClick={handleAddConference}>Subscribe to Conference</button>
+          <hr style={{ margin: "15px 0" }} />
+          <CreateConference />
+        </div>
+      </div>
+
       <div className="box calendar-container">
         <Calendar />
       </div>
@@ -137,35 +161,17 @@ function Home() {
         <p>No messages at this time.</p>
       </div>
 
-      <div className="box upcoming-conferences">
-        <EventList
-          conferences={conferences}
-          onDelete={handleDeleteConference}
+      <div className="box upcoming-talks">
+        <TalkList
+          talks={talks}
+          onFlag={handleFlagTalk}
+          flaggedTalks={flaggedTalks}
         />
       </div>
 
-      <div className="box add-conference">
-        <h3>Add Conference via ID</h3>
-        <p>Enter the conference ID to add it to the list.</p>
-        <input
-          type="text"
-          value={conferenceId}
-          onChange={(e) => setConferenceId(e.target.value)}
-          placeholder="Conference ID"
-        />
-        <button onClick={handleAddConference}>Add Conference</button>
-      </div>
       <div className="bottom-right">
         <p>{currentDateTime}</p>
       </div>
-
-      <div className="box upcoming-talks">
-        <TalkList talks={talks}
-        onFlag={handleFlagTalk}
-        flaggedTalks={flaggedTalks} // Pass flaggedTalks to TalkList
-        />
-      </div>
-
     </div>
   );
 }

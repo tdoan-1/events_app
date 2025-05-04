@@ -35,7 +35,9 @@ router.post('/create', async (req, res) => {
           conference_id: parseInt(conference_id),
           abstract,
           authors: authors || null,
-          time_: time_ ? new Date(`1970-01-01T${time_}`) : null, // expects time_ as string like "13:00:00"
+          time_: time_ && /^\d{2}:\d{2}$/.test(time_)
+            ? new Date(`1970-01-01T${time_}:00`)
+            : null,
           loca,
           comments: comments || null
         }

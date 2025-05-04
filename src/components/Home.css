@@ -51,8 +51,8 @@ body, html {
   /* Right side */
   .upcoming-talks {
     top: 20px;
-    right: 40px;
-    width: 310px;
+    right: 35px;
+    width: 320px;
     height: 400px;
     overflow-y: auto;
   }

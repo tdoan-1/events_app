@@ -3,6 +3,7 @@ import { getConferences } from "../api.js";
 import EventList from "./EventList.jsx";
 import TalkList from "./TalkList.jsx";
 import CreateConference from "./CreateConference.jsx";
+import CreateTalk from "./CreateTalk.jsx";
 import "./Home.css";
 
 function Calendar() {

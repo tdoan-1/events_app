@@ -56,7 +56,7 @@ function CreateConference() {
       {showModal && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <h3>Create Conference</h3>
+            <h3>Create New Conference</h3>
             <form onSubmit={handleSubmit}>
               <input
                 type="text"

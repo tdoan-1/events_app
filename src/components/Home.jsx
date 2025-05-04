@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { getConferences } from "../api.js";
 import EventList from "./EventList.jsx";
 import TalkList from "./TalkList.jsx";
+import CreateConference from "./CreateConference.jsx";
 import "./Home.css";
 
 function Calendar() {
@@ -60,14 +61,12 @@ function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  // Fetch conferences from the backend
   useEffect(() => {
     getConferences().then((data) => {
       setConferences(data);
     });
   }, []);
 
-  // Fetch talks from the backend
   useEffect(() => {
     fetch(`http://localhost:5000/api/talk/list`)
       .then((response) => {
@@ -77,7 +76,7 @@ function Home() {
         return response.json();
       })
       .then((data) => {
-        setTalks(data); // Store talks in state
+        setTalks(data);
       })
       .catch((error) => {
         console.error("Error fetching talks:", error);
@@ -85,13 +84,11 @@ function Home() {
   }, []);
 
   const handleAddConference = () => {
-
-    console.log("Adding conference with ID:", conferenceId);
-
     if (!conferenceId.trim()) {
       alert("Please enter a valid conference ID.");
       return;
     }
+
     fetch(`http://localhost:5000/api/conference/${conferenceId}`)
       .then((response) => {
         if (!response.ok) {
@@ -145,8 +142,7 @@ function Home() {
       </div>
 
       <div className="box add-conference">
-        <h3>Add Conference via ID</h3>
-        <p>Enter the conference ID to add it to the list.</p>
+        <h3>Add Conference with ID</h3>
         <input
           type="text"
           value={conferenceId}
@@ -154,18 +150,23 @@ function Home() {
           placeholder="Conference ID"
         />
         <button onClick={handleAddConference}>Add Conference</button>
-      </div>
-      <div className="bottom-right">
-        <p>{currentDateTime}</p>
+
+        <hr style={{ margin: "15px 0" }} />
+
+        <CreateConference />
       </div>
 
       <div className="box upcoming-talks">
-        <TalkList talks={talks}
-        onFlag={handleFlagTalk}
-        flaggedTalks={flaggedTalks} // Pass flaggedTalks to TalkList
+        <TalkList
+          talks={talks}
+          onFlag={handleFlagTalk}
+          flaggedTalks={flaggedTalks}
         />
       </div>
 
+      <div className="bottom-right">
+        <p>{currentDateTime}</p>
+      </div>
     </div>
   );
 }

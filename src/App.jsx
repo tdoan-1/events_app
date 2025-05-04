@@ -28,7 +28,6 @@ function App() {
           <Route path="/" element={<MainMenu />} />
           <Route path="/home" element={<Home />} />
         </Routes>
-        <Footer />
       </div>
     </Router>
   );

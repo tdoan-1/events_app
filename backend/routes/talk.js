@@ -53,8 +53,32 @@ router.post('/create', async (req, res) => {
     }
   });
   
-
-
+  // API to flag talks
+router.post('/flag', async (req, res) => {
+    const { user_id, talks_id } = req.body;
+  
+    if (!user_id || !talks_id) {
+      return res.status(400).json({ message: "Missing user_id or talks_id" });
+    }
+  
+    try {
+      await prisma.own_talks.create({
+        data: {
+          user_id: parseInt(user_id),
+          talks_id: parseInt(talks_id)
+        }
+      });
+      res.status(201).json({ message: "Talk flagged successfully." });
+    } catch (error) {
+      if (error.code === 'P2002') {
+        res.status(400).json({ message: "Talk already flagged." });
+      } else {
+        console.error("Error flagging talk:", error);
+        res.status(500).json({ message: "Failed to flag talk." });
+      }
+    }
+  });
+  
 
 // Export the router to use in `server.js`
 module.exports = router;

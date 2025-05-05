@@ -122,11 +122,37 @@ function Home() {
     );
   };
 
-  const handleFlagTalk = (talkId) => {
-    setFlaggedTalks((prev) =>
-      prev.includes(talkId) ? prev.filter((id) => id !== talkId) : [...prev, talkId]
-    );
+  const handleFlagTalk = async (talkId) => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const user_id = user?.id;
+  
+    if (!user_id) {
+      alert("⚠️ You must be logged in to flag a talk.");
+      return;
+    }
+  
+    console.log("⚠️ Attempting to flag talk:", { user_id, talkId });
+  
+    try {
+      const res = await fetch("http://localhost:5000/api/talk/flag", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ user_id, talks_id: talkId })
+      });
+  
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message);
+  
+      console.log("✅ Talk successfully flagged:", result);
+      setFlaggedTalks((prev) => [...prev, talkId]);
+    } catch (err) {
+      console.error("❌ Error flagging talk:", err.message);
+      alert("Error flagging talk: " + err.message);
+    }
   };
+  
 
   return (
     <div className="home-container">

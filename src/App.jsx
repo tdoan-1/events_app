@@ -6,6 +6,9 @@ import { useEffect, useState } from "react";
 import { getConferences } from "./api.js";
 import Home from "./components/Home";
 import MainMenu from "./components/MainMenu";
+import AddConference from "./components/AddConference";
+import Login from "./components/Login";
+import AddTalk from "./components/AddTalk";
 
 function App() {
 
@@ -25,8 +28,10 @@ function App() {
       <div className="App">
         <Header />
         <Routes>
-          <Route path="/" element={<MainMenu />} />
+          <Route path="/" element={<Login />} />
           <Route path="/home" element={<Home />} />
+          <Route path="/add-conference" element={<AddConference />} />
+          <Route path="/add-talk" element={<AddTalk />} />
         </Routes>
       </div>
     </Router>

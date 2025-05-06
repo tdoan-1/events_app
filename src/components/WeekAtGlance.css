@@ -1,0 +1,105 @@
+.week-at-glance {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.week-at-glance h3 {
+  color: #333;
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 10px;
+}
+
+.glance-sections {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.glance-section {
+  background: #f8f9fa;
+  border-radius: 6px;
+  padding: 15px;
+}
+
+.glance-section h4 {
+  color: #444;
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+}
+
+.glance-item {
+  background: white;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.item-header h5 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 1rem;
+}
+
+.item-details {
+  display: flex;
+  gap: 15px;
+  color: #666;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.item-details span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.unsubscribe-btn {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.unsubscribe-btn:hover {
+  background: #c0392b;
+}
+
+.flag-btn {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #95a5a6;
+  transition: color 0.2s;
+}
+
+.flag-btn.flagged {
+  color: #f1c40f;
+}
+
+.flag-btn:hover {
+  color: #f1c40f;
+}
+
+@media (max-width: 768px) {
+  .glance-sections {
+    grid-template-columns: 1fr;
+  }
+} 

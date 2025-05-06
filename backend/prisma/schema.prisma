@@ -8,16 +8,17 @@ datasource db {
 }
 
 model conference {
-  conference_id Int        @id @default(autoincrement())
-  title         String     @db.VarChar(50)
-  short_name    String     @db.VarChar(20)
-  loca          String     @db.VarChar(100)
-  dates         DateTime   @db.Date
-  website       String?    @db.VarChar(50)
-  logo          String?    @db.VarChar(100)
+  conference_id Int            @id @default(autoincrement())
+  title         String         @db.VarChar(50)
+  short_name    String         @db.VarChar(20)
+  loca          String         @db.VarChar(100)
+  dates         DateTime       @db.Date
+  website       String?        @db.VarChar(50)
+  logo          String?        @db.VarChar(100)
   schedule      schedule[]
   talks         talks[]
   users         users[]
+  announcements announcement[]
 }
 
 model flags {
@@ -124,8 +125,13 @@ model VerificationToken {
 }
 
 model announcement {
-  announcement_id   Int     @id @default(autoincrement())
-  announcement_desc String? @db.VarChar(200)
+  announcement_id   Int        @id @default(autoincrement())
+  announcement_desc String     @db.VarChar(200)
+  conference_id    Int
+  user_id          Int
+  created_at       DateTime   @default(now())
+  conference       conference @relation(fields: [conference_id], references: [conference_id], onDelete: Cascade)
+  user             users      @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
 }
 
 model is_enabled {

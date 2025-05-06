@@ -2,54 +2,181 @@
 body, html {
   margin: 0;
   padding: 0;
-  font-family: 'Arial', sans-serif;
-  background-color: #f4f8fc; /* Softer background color */
-  color: #333;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #f8fafc;
+  color: #1e293b;
   overflow-x: hidden;
+  line-height: 1.5;
 }
 
 .home-container {
-  display: grid; /* Use grid layout for better control */
-  grid-template-columns: 300px auto 300px; /* Left panel, center calendar, right panel */
-  grid-template-rows: auto auto; /* Rows for main content and messages */
-  gap: 40px; /* Space between sections */
-  justify-content: center;
-  align-items: start;
-  min-height: 100vh;
-  padding: 40px;
-  background-color: #f4f8fc;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 20px;
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-/* Box Layout */
 .box {
   background-color: #ffffff;
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
   padding: 20px;
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Left Panel Styling */
+.box:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 12px -1px rgba(0, 0, 0, 0.08), 0 4px 6px -1px rgba(0, 0, 0, 0.04);
+}
+
 .left-panel {
-  grid-column: 1; /* Place in the first column */
-  grid-row: 1; /* Place in the first row */
+  grid-column: 1;
+  grid-row: 1 / span 2;
   width: 300px;
-  padding: 20px;
+  padding: 0;
   display: flex;
   flex-direction: column;
   gap: 20px;
-  background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  background: transparent;
+  border: none;
+  box-shadow: none;
 }
 
-.upcoming-conferences {
-  height: 300px;
-  overflow-y: auto;
-  padding: 10px;
-  border: 1px solid #e0e0e0;
+.week-at-glance-container {
+  background: white;
   border-radius: 8px;
-  background-color: #f9f9f9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  height: 100%;
+  overflow-y: auto;
+}
+
+.calendar-container {
+  grid-column: 2;
+  grid-row: 1;
+  max-width: 100%;
+  min-height: 400px;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.messages {
+  grid-column: 2;
+  grid-row: 2;
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.calendar-header button {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #666;
+}
+
+.calendar-header button:hover {
+  color: #333;
+}
+
+.days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+.day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fa;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.bottom-right {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 10px 20px;
+  border-radius: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+@media (max-width: 1024px) {
+  .home-container {
+    grid-template-columns: 1fr;
+  }
+
+  .left-panel {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .calendar-container {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .messages {
+    grid-column: 1;
+    grid-row: 3;
+  }
+}
+
+/* Left Panel Styling */
+.upcoming-conferences {
+  height: calc((100vh - 80px) * 0.9);
+  overflow-y: auto;
+  padding: 20px;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+.upcoming-conferences h3 {
+  margin: 0 0 16px 0;
+  color: #1e293b;
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
 }
 
 .add-conference {
@@ -59,153 +186,49 @@ body, html {
   background-color: #f9f9f9;
 }
 
-.calendar-container {
-    grid-column: 2;       /* Still in center column */
-    grid-row: 1;          /* First row */
-    max-width: 700px;
-    text-align: center;
-    background-color: #ffffff;
-    padding: 20px;        /* Reduced from 30px */
-    border-radius: 12px;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-    margin: 0 auto;       /* Horizontal centering only */
-    margin-bottom: 0;
-  }
-  
-
 /* Right Panel */
 .upcoming-talks {
-  grid-column: 3; /* Place in the third column */
-  grid-row: 1; /* Place in the first row */
+  grid-column: 3;
+  grid-row: 1;
   width: 300px;
-  height: 450px;
+  height: calc((100vh - 80px) * 0.9);
   padding: 20px;
   background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 14px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
   overflow-y: auto;
-}
-
-/* Messages Box */
-.messages {
-  grid-column: 2; /* Align directly below the calendar */
-  grid-row: 1; /* Place in the second row */
-  align-self: end; /* Align to the top of the row */
-  transform: translateY(30%);
-  width: auto; /* Adjust width to fit the new position */
-  min-height: 200px;
-  padding: 0px;
-  background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  margin-top: 0px; /* Reduced margin to move the box slightly up */
-}
-
-/* Calendar Header */
-.calendar-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  padding: 10px;
-  background-color: #f1f5f9;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.calendar-header h3 {
-  margin: 0;
-  font-size: 1.8rem;
-  color: #333;
-}
-
-.calendar-header button {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 10px 20px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.calendar-header button:hover {
-  background-color: #0056b3;
-  transform: scale(1.05);
-}
-
-/* Day Grid */
-.days {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 10px;
-  padding: 10px;
-}
-
-.day {
-  text-align: center;
-  padding: 15px;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  font-size: 1rem;
-  color: #333;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.day:hover {
-  background-color: #e9ecef;
-  transform: scale(1.05);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-/* Highlight Conference Days */
-.day.conference {
-  background-color: #ffc107;
-  font-weight: bold;
-  color: black;
-  border: 2px solid #ff9800;
-  transform: scale(1.1);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-}
-
-/* Clock Styling */
-.bottom-right {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  font-size: 18px;
-  font-weight: bold;
-  color: #333;
 }
 
 /* Header Text Styling */
 h3 {
-  font-size: 1.8rem;
-  font-weight: bold;
-  color: #333;
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: #1e293b;
+  letter-spacing: -0.025em;
+  margin: 0 0 14px 0;
 }
 
 h4 {
-  font-size: 1.4rem;
-  color: #555;
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: #475569;
+  margin: 0 0 10px 0;
 }
 
 /* Buttons */
 button {
-  background-color: #007bff;
+  background-color: #3b82f6;
   color: white;
   border: none;
   border-radius: 8px;
-  padding: 10px 15px;
+  padding: 8px 14px;
   cursor: pointer;
-  font-size: 1rem;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
 button:hover {
-  background-color: #0056b3;
-  transform: scale(1.05);
+  background-color: #2563eb;
+  transform: translateY(-1px);
 }

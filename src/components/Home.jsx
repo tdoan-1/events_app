@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { getConferences } from "../api.js";
-import EventList from "./EventList.jsx";
-import TalkList from "./TalkList.jsx";
-import CreateConference from "./CreateConference.jsx";
-import CreateTalk from "./CreateTalk.jsx";
+import WeekAtGlance from "./WeekAtGlance.jsx";
 import "./Home.css";
 
 function Calendar() {
@@ -47,7 +44,6 @@ function Calendar() {
 function Home() {
   const [currentDateTime, setCurrentDateTime] = useState("");
   const [conferences, setConferences] = useState([]);
-  const [conferenceTitle, setConferenceTitle] = useState("");
   const [talks, setTalks] = useState([]);
   const [flaggedTalks, setFlaggedTalks] = useState([]);
 
@@ -84,38 +80,6 @@ function Home() {
       });
   }, []);
 
-  const handleAddConference = () => {
-    if (!conferenceTitle.trim()) {
-      alert("Please enter a valid conference title.");
-      return;
-    }
-
-    fetch(`http://localhost:5000/api/conference/list`)
-      .then((response) => response.json())
-      .then((allConfs) => {
-        const match = allConfs.find(
-          (conf) => conf.title.toLowerCase() === conferenceTitle.toLowerCase()
-        );
-
-        if (!match) {
-          alert("Conference title not found.");
-          return;
-        }
-
-        if (conferences.some((c) => c.conference_id === match.conference_id)) {
-          alert("Conference is already in the list.");
-          return;
-        }
-
-        setConferences((prev) => [...prev, match]);
-        setConferenceTitle("");
-      })
-      .catch((error) => {
-        console.error("Error searching conference by title:", error);
-        alert("Failed to add conference. Please try again.");
-      });
-  };
-
   const handleDeleteConference = (conferenceIdToDelete) => {
     setConferences((prev) =>
       prev.filter((conf) => conf.conference_id !== conferenceIdToDelete)
@@ -131,8 +95,6 @@ function Home() {
       return;
     }
   
-    console.log("⚠️ Attempting to flag talk:", { user_id, talkId });
-  
     try {
       const res = await fetch("http://localhost:5000/api/talk/flag", {
         method: "POST",
@@ -145,36 +107,24 @@ function Home() {
       const result = await res.json();
       if (!res.ok) throw new Error(result.message);
   
-      console.log("✅ Talk successfully flagged:", result);
       setFlaggedTalks((prev) => [...prev, talkId]);
     } catch (err) {
       console.error("❌ Error flagging talk:", err.message);
       alert("Error flagging talk: " + err.message);
     }
   };
-  
 
   return (
     <div className="home-container">
       <div className="left-panel">
-        <div className="box upcoming-conferences">
-          <EventList
+        <div className="box week-at-glance-container">
+          <WeekAtGlance
             conferences={conferences}
-            onDelete={handleDeleteConference}
+            talks={talks}
+            onDeleteConference={handleDeleteConference}
+            onFlagTalk={handleFlagTalk}
+            flaggedTalks={flaggedTalks}
           />
-        </div>
-
-        <div className="box add-conference">
-          <h3>Add Conference by Title</h3>
-          <input
-            type="text"
-            value={conferenceTitle}
-            onChange={(e) => setConferenceTitle(e.target.value)}
-            placeholder="Conference Title"
-          />
-          <button onClick={handleAddConference}>Subscribe to Conference</button>
-          <hr style={{ margin: "15px 0" }} />
-          <CreateConference />
         </div>
       </div>
 
@@ -185,14 +135,6 @@ function Home() {
       <div className="box messages">
         <h3>Messages</h3>
         <p>No messages at this time.</p>
-      </div>
-
-      <div className="box upcoming-talks">
-        <TalkList
-          talks={talks}
-          onFlag={handleFlagTalk}
-          flaggedTalks={flaggedTalks}
-        />
       </div>
 
       <div className="bottom-right">

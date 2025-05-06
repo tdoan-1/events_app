@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { getConferences } from "../api.js";
 import EventList from "./EventList.jsx";
 import TalkList from "./TalkList.jsx";
 import CreateConference from "./CreateConference.jsx";
@@ -11,33 +10,21 @@ function Calendar() {
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
   ];
-
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
 
-  const getDaysInMonth = (year, month) => {
-    return new Date(year, month + 1, 0).getDate();
-  };
-
-  const handlePrevMonth = () => {
-    setCurrentMonth((prev) => (prev === 0 ? 11 : prev - 1));
-  };
-
-  const handleNextMonth = () => {
-    setCurrentMonth((prev) => (prev === 11 ? 0 : prev + 1));
-  };
+  const getDaysInMonth = (year, month) =>
+    new Date(year, month + 1, 0).getDate();
 
   return (
     <div className="calendar-box">
       <div className="calendar-header">
-        <button onClick={handlePrevMonth}>&lt;</button>
+        <button onClick={() => setCurrentMonth(prev => (prev === 0 ? 11 : prev - 1))}>&lt;</button>
         <h3>{months[currentMonth]} 2025</h3>
-        <button onClick={handleNextMonth}>&gt;</button>
+        <button onClick={() => setCurrentMonth(prev => (prev === 11 ? 0 : prev + 1))}>&gt;</button>
       </div>
       <div className="days">
         {Array.from({ length: getDaysInMonth(2025, currentMonth) }, (_, day) => (
-          <div key={day + 1} className="day">
-            {day + 1}
-          </div>
+          <div key={day + 1} className="day">{day + 1}</div>
         ))}
       </div>
     </div>
@@ -52,118 +39,117 @@ function Home() {
   const [flaggedTalks, setFlaggedTalks] = useState([]);
 
   useEffect(() => {
-    const updateDateTime = () => {
-      const now = new Date();
-      setCurrentDateTime(now.toLocaleString());
-    };
-
-    updateDateTime();
-    const interval = setInterval(updateDateTime, 1000);
+    const interval = setInterval(() => {
+      setCurrentDateTime(new Date().toLocaleString());
+    }, 1000);
     return () => clearInterval(interval);
   }, []);
 
+  const fetchSubscribedConferences = () => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const email = user?.email;
+    if (!email) return;
+
+    fetch(`http://localhost:5000/api/conference/list?email=${encodeURIComponent(email)}`)
+      .then((res) => res.json())
+      .then((data) => setConferences(data))
+      .catch((err) => console.error("Failed to load conferences", err));
+  };
+
   useEffect(() => {
-    getConferences().then((data) => {
-      setConferences(data);
-    });
+    fetchSubscribedConferences();
   }, []);
 
   useEffect(() => {
-    fetch(`http://localhost:5000/api/talk/list`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to fetch talks");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setTalks(data);
-      })
-      .catch((error) => {
-        console.error("Error fetching talks:", error);
-      });
+    fetch("http://localhost:5000/api/talk/list")
+      .then((res) => res.json())
+      .then((data) => setTalks(data))
+      .catch((err) => console.error("Failed to load talks", err));
   }, []);
 
-  const handleAddConference = () => {
+  const handleAddConference = async () => {
     if (!conferenceTitle.trim()) {
       alert("Please enter a valid conference title.");
       return;
     }
 
-    fetch(`http://localhost:5000/api/conference/list`)
-      .then((response) => response.json())
-      .then((allConfs) => {
-        const match = allConfs.find(
-          (conf) => conf.title.toLowerCase() === conferenceTitle.toLowerCase()
-        );
+    const user = JSON.parse(localStorage.getItem("user"));
+    const email = user?.email;
+    if (!email) {
+      alert("Login required.");
+      return;
+    }
 
-        if (!match) {
-          alert("Conference title not found.");
-          return;
-        }
+    const allConfs = await fetch("http://localhost:5000/api/conference/list")
+      .then(res => res.json());
 
-        if (conferences.some((c) => c.conference_id === match.conference_id)) {
-          alert("Conference is already in the list.");
-          return;
-        }
+    const match = allConfs.find(conf =>
+      conf.title.toLowerCase() === conferenceTitle.toLowerCase()
+    );
 
-        setConferences((prev) => [...prev, match]);
-        setConferenceTitle("");
-      })
-      .catch((error) => {
-        console.error("Error searching conference by title:", error);
-        alert("Failed to add conference. Please try again.");
-      });
+    if (!match) {
+      alert("Conference not found.");
+      return;
+    }
+
+    const res = await fetch("http://localhost:5000/api/conference/subscribe", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        conferenceId: match.conference_id,
+        userEmail: email,
+      }),
+    });
+
+    if (res.ok) {
+      setConferences(prev => [...prev, match]);
+      setConferenceTitle("");
+    } else {
+      alert("Subscription failed.");
+    }
   };
 
-  const handleDeleteConference = (conferenceIdToDelete) => {
-    setConferences((prev) =>
-      prev.filter((conf) => conf.conference_id !== conferenceIdToDelete)
-    );
+  const handleDeleteConference = async (confId) => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const email = user?.email;
+    if (!email) return;
+
+    const res = await fetch("http://localhost:5000/api/conference/unsubscribe", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ conferenceId: confId, userEmail: email }),
+    });
+
+    if (res.ok) {
+      setConferences(prev => prev.filter(c => c.conference_id !== confId));
+    } else {
+      alert("Failed to unsubscribe.");
+    }
   };
 
   const handleFlagTalk = async (talkId) => {
     const user = JSON.parse(localStorage.getItem("user"));
     const user_id = user?.id;
-  
     if (!user_id) {
-      alert("⚠️ You must be logged in to flag a talk.");
+      alert("Login required.");
       return;
     }
-  
-    console.log("⚠️ Attempting to flag talk:", { user_id, talkId });
-  
-    try {
-      const res = await fetch("http://localhost:5000/api/talk/flag", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ user_id, talks_id: talkId })
-      });
-  
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.message);
-  
-      console.log("✅ Talk successfully flagged:", result);
-      setFlaggedTalks((prev) => [...prev, talkId]);
-    } catch (err) {
-      console.error("❌ Error flagging talk:", err.message);
-      alert("Error flagging talk: " + err.message);
-    }
+
+    await fetch("http://localhost:5000/api/talk/flag", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ user_id, talks_id: talkId }),
+    });
+
+    setFlaggedTalks((prev) => [...prev, talkId]);
   };
-  
 
   return (
     <div className="home-container">
       <div className="left-panel">
         <div className="box upcoming-conferences">
-          <EventList
-            conferences={conferences}
-            onDelete={handleDeleteConference}
-          />
+          <EventList conferences={conferences} onDelete={handleDeleteConference} />
         </div>
-
         <div className="box add-conference">
           <h3>Add Conference by Title</h3>
           <input
@@ -173,28 +159,21 @@ function Home() {
             placeholder="Conference Title"
           />
           <button onClick={handleAddConference}>Subscribe to Conference</button>
-          <hr style={{ margin: "15px 0" }} />
+          <hr />
           <CreateConference />
         </div>
       </div>
-
       <div className="box calendar-container">
         <Calendar />
       </div>
-
       <div className="box messages">
         <h3>Messages</h3>
-        <p>No messages at this time.</p>
+        <p>No messages yet.</p>
       </div>
-
       <div className="box upcoming-talks">
-        <TalkList
-          talks={talks}
-          onFlag={handleFlagTalk}
-          flaggedTalks={flaggedTalks}
-        />
+        <TalkList talks={talks} onFlag={handleFlagTalk} flaggedTalks={flaggedTalks} />
+        <CreateTalk />
       </div>
-
       <div className="bottom-right">
         <p>{currentDateTime}</p>
       </div>

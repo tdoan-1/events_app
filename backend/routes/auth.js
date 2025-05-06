@@ -57,7 +57,7 @@ router.post('/user/login-or-create', async (req, res) => {
 
   // finding the user by email
   try { 
-    let user = await prisma.user.findUnique({
+    let user = await prisma.User.findUnique({
       where: { email },
     });
 
@@ -67,12 +67,12 @@ router.post('/user/login-or-create', async (req, res) => {
       // Generate unique 6-digit ID as string (e.g., "001234")
       while (exists) {
         newId = Math.floor(Math.random() * 1000000).toString().padStart(6, "0");
-        exists = await prisma.user.findUnique({ where: { id: newId } });
+        exists = await prisma.User.findUnique({ where: { id: newId } });
       }
 
   
       // creating a new user with a random id
-      user = await prisma.user.create({
+      user = await prisma.User.create({
         data: {
           id: newId,
           email,

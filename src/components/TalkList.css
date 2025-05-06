@@ -6,3 +6,18 @@
     margin-bottom: 10px;
   }
   
+  .button-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+  
+  /* Override default button style for just this component */
+  .button-row button {
+    flex: 0 0 auto;
+    width: auto;
+    white-space: nowrap;
+  }
+  

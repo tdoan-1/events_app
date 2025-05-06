@@ -51,23 +51,29 @@ router.post("/verify-code", (req, res) => {
   }
 });
 
-// ✅ POST /api/user/login-or-create
+// API to create a new user or log in an existing one
 router.post('/user/login-or-create', async (req, res) => {
   const { email } = req.body;
 
-  try {
-    // Try to find the user by email
+  // finding the user by email
+  try { 
     let user = await prisma.user.findUnique({
       where: { email },
     });
 
-    // If not found, create the user
     if (!user) {
+      let newId, exists = true;
+      while (exists) {
+        newId = Math.floor(Math.random() * 1000000).toString();
+        exists = await prisma.user.findUnique({ where: { id: newId } });
+      }
+
+      // creating a new user with a random id
       user = await prisma.user.create({
         data: {
-          id: uuidv4(),                // ✅ Generate unique UUID
+          id: newId,
           email,
-          name: email.split("@")[0],  // Optional name from email
+          name: email.split("@")[0],
         },
       });
     }
@@ -78,5 +84,6 @@ router.post('/user/login-or-create', async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
 
 module.exports = router;

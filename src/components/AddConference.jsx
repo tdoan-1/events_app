@@ -43,7 +43,7 @@ function AddConference() {
         });
 
       // Fetch user's subscribed conferences
-      fetch(`http://localhost:5000/api/conference/user/${user.id}`)
+      fetch(`http://localhost:5000/api/conference/list?email=${user.email}`)
         .then(response => response.json())
         .then(data => {
           setSubscribedConferences(data.map(conf => conf.conference_id));
@@ -120,14 +120,15 @@ function AddConference() {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          user_id: user.id,
-          conference_id: conferenceId,
-          role_id: 1 // Regular user role
+          conferenceId: conferenceId,
+          userEmail: user.email
         })
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error("Failed to subscribe to conference");
+        throw new Error(data.message || "Failed to subscribe to conference");
       }
 
       // Update subscribed conferences list
@@ -147,18 +148,20 @@ function AddConference() {
 
     try {
       const response = await fetch("http://localhost:5000/api/conference/unsubscribe", {
-        method: "POST",
+        method: "DELETE",
         headers: {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          user_id: user.id,
-          conference_id: conferenceId
+          conferenceId: conferenceId,
+          userEmail: user.email
         })
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error("Failed to unsubscribe from conference");
+        throw new Error(data.message || "Failed to unsubscribe from conference");
       }
 
       // Update subscribed conferences list

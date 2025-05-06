@@ -169,13 +169,14 @@ router.get('/:id', async (req, res) => {
 
 // POST /api/conference/create
 router.post('/create', async (req, res) => {
-  const { title, short_name, loca, dates } = req.body;
+  const { title, short_name, loca, dates, userEmail } = req.body;
 
-  if (!title || !short_name || !loca || !dates) {
+  if (!title || !short_name || !loca || !dates || !userEmail) {
     return res.status(400).json({ message: "All fields are required" });
   }
 
   try {
+    // 1. Create conference
     const newConference = await prisma.conference.create({
       data: {
         title,
@@ -185,14 +186,47 @@ router.post('/create', async (req, res) => {
       }
     });
 
+    // 2. Find user who created it
+    const authUser = await prisma.user.findUnique({ where: { email: userEmail } });
+    if (!authUser) return res.status(404).json({ message: "User not found." });
+
+    const baseId = authUser.id.toString();
+    const allUsers = await prisma.users.findMany();
+    const existingIds = allUsers.map(u => u.user_id.toString());
+
+    // 3. Find unique user_id with suffix
+    let suffix = 0;
+    let combinedId;
+    while (suffix < 100) {
+      combinedId = parseInt(baseId + suffix.toString().padStart(2, "0"));
+      if (!existingIds.includes(combinedId.toString())) break;
+      suffix++;
+    }
+
+    if (suffix >= 100) {
+      return res.status(500).json({ message: "No available user_id slots." });
+    }
+
+    // 4. Create admin link in `users` table
+    await prisma.users.create({
+      data: {
+        user_id: combinedId,
+        conference_id: newConference.conference_id,
+        role_id: 2 // mark as admin
+      }
+    });
+
     res.status(201).json({
-      message: "Conference created successfully.",
+      message: "Conference created and admin assigned.",
       data: newConference
     });
+
   } catch (error) {
-    console.error("Error creating conference:", error);
+    console.error("Create conference error:", error);
     res.status(500).json({ message: "Failed to create conference." });
   }
 });
+
+
 
 module.exports = router;

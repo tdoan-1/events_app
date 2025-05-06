@@ -11,6 +11,9 @@ router.get('/list', async (req, res) => {
     if (!email) {
       // fallback to all conferences
       const allConfs = await prisma.conference.findMany({
+        include: {
+          users: true
+        },
         orderBy: { conference_id: 'asc' }
       });
       return res.json(allConfs);
@@ -38,6 +41,9 @@ router.get('/list', async (req, res) => {
     // Step 3: Get conference details
     const subscribedConfs = await prisma.conference.findMany({
       where: { conference_id: { in: conferenceIds } },
+      include: {
+        users: true
+      },
       orderBy: { conference_id: 'asc' }
     });
 

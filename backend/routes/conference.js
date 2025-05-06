@@ -1,30 +1,148 @@
-const express = require('express'); // import Express
-const {PrismaClient} = require('@prisma/client');  // import PrismaClient
-const prisma = new PrismaClient();  // instantiate PrismaClient
-const router = express.Router(); // creating router
+const express = require('express');
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
+const router = express.Router();
 
-// API to fetch list of conferences
+// GET /api/conference/list?email=someone@example.com
 router.get('/list', async (req, res) => {
+  const email = req.query.email;
 
-    try {
-        const conferences = await prisma.conference.findMany({
-          orderBy: [
-            {
-              conference_id: 'asc'
-            }
-          ]
-    });
-        res.json(conferences);
-
-    } 
-    catch (error) {
-      console.error("Error fetching conferences:", error);
-      res.status(500).json({ message: "Failed to fetch conferences from conference.js" });
+  try {
+    if (!email) {
+      // fallback to all conferences
+      const allConfs = await prisma.conference.findMany({
+        orderBy: { conference_id: 'asc' }
+      });
+      return res.json(allConfs);
     }
-  } 
-);
 
-// API to fetch a conference by ID
+    // Step 1: Get 6-digit user ID from auth user table
+    const authUser = await prisma.user.findUnique({
+      where: { email }
+    });
+
+    if (!authUser) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    const baseId = authUser.id.toString();
+
+    // Step 2: Get all users entries whose user_id starts with baseId
+    const linked = await prisma.users.findMany();
+    const userEntries = linked.filter(u =>
+      u.user_id.toString().startsWith(baseId)
+    );
+
+    const conferenceIds = userEntries.map(u => u.conference_id);
+
+    // Step 3: Get conference details
+    const subscribedConfs = await prisma.conference.findMany({
+      where: { conference_id: { in: conferenceIds } },
+      orderBy: { conference_id: 'asc' }
+    });
+
+    res.json(subscribedConfs);
+  } catch (error) {
+    console.error("Error fetching user conferences:", error);
+    res.status(500).json({ message: "Failed to fetch subscribed conferences" });
+  }
+});
+
+// POST /api/conference/subscribe
+router.post('/subscribe', async (req, res) => {
+  const { conferenceId, userEmail } = req.body;
+
+  try {
+    const authUser = await prisma.user.findUnique({
+      where: { email: userEmail }
+    });
+
+    if (!authUser) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    const baseId = authUser.id.toString();
+    const allUsers = await prisma.users.findMany();
+
+    // Check for existing subscription
+    const existing = allUsers.find(
+      u => u.user_id.toString().startsWith(baseId) && u.conference_id === conferenceId
+    );
+
+    if (existing) {
+      return res.status(200).json({ message: "Already subscribed." });
+    }
+
+    // Find unique 2-digit suffix
+    let suffix = 0;
+    let combinedId;
+    const existingIds = allUsers.map(u => u.user_id.toString());
+
+    while (suffix < 100) {
+      combinedId = parseInt(baseId + suffix.toString().padStart(2, "0"));
+      if (!existingIds.includes(combinedId.toString())) break;
+      suffix++;
+    }
+
+    if (suffix >= 100) {
+      return res.status(500).json({ message: "No available user_id slots." });
+    }
+
+    // Insert new subscription
+    const newSubscription = await prisma.users.create({
+      data: {
+        user_id: combinedId,
+        conference_id: conferenceId,
+        role_id: 1
+      }
+    });
+
+    res.status(201).json({ message: "Subscribed successfully.", data: newSubscription });
+  } catch (error) {
+    console.error("Subscribe error:", error);
+    res.status(500).json({ message: "Failed to subscribe." });
+  }
+});
+
+// DELETE /api/conference/unsubscribe
+router.delete('/unsubscribe', async (req, res) => {
+  const { conferenceId, userEmail } = req.body;
+
+  try {
+    const authUser = await prisma.user.findUnique({
+      where: { email: userEmail }
+    });
+
+    if (!authUser) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    const baseId = authUser.id.toString();
+    const allLinks = await prisma.users.findMany();
+
+    const entriesToDelete = allLinks.filter(
+      u =>
+        u.conference_id === conferenceId &&
+        u.user_id.toString().startsWith(baseId)
+    );
+
+    const idsToDelete = entriesToDelete.map(e => e.user_id);
+
+    await prisma.users.deleteMany({
+      where: {
+        user_id: { in: idsToDelete },
+        conference_id: conferenceId
+      }
+    });
+
+    res.status(200).json({ message: "Unsubscribed successfully." });
+  } catch (error) {
+    console.error("Unsubscribe error:", error);
+    res.status(500).json({ message: "Failed to unsubscribe." });
+  }
+});
+
+// GET /api/conference/:id
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
   const parsedId = parseInt(id, 10);
@@ -35,7 +153,7 @@ router.get('/:id', async (req, res) => {
 
   try {
     const conference = await prisma.conference.findUnique({
-      where: { conference_id: parsedId },
+      where: { conference_id: parsedId }
     });
 
     if (!conference) {
@@ -49,30 +167,32 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// API to create conference
+// POST /api/conference/create
 router.post('/create', async (req, res) => {
-    const { title, short_name, loca, dates } = req.body;
-    if (!title || !short_name || !loca || !dates ) {
-        return res.status(400).json({ message: "All fields are required" });
-    }
+  const { title, short_name, loca, dates } = req.body;
 
-    try {
-      const newConference = await prisma.conference.create({
-        data: {
-          title,
-          short_name,
-          loca,
-          dates: new Date(dates) // make sure this is a Date object
-        }
-      });
+  if (!title || !short_name || !loca || !dates) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
 
-      res.status(201).json({ message: "Conference created successfully.", data: { title, short_name, loca, dates } });
-    } 
-    catch {
-      console.error("Error creating conference:", error);
-      res.status(500).json({ message: "Failed to create conference." });
-    }
-}); 
+  try {
+    const newConference = await prisma.conference.create({
+      data: {
+        title,
+        short_name,
+        loca,
+        dates: new Date(dates)
+      }
+    });
 
-// export router to use in `server.js`
+    res.status(201).json({
+      message: "Conference created successfully.",
+      data: newConference
+    });
+  } catch (error) {
+    console.error("Error creating conference:", error);
+    res.status(500).json({ message: "Failed to create conference." });
+  }
+});
+
 module.exports = router;

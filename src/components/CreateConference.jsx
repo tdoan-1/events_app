@@ -17,6 +17,14 @@ function CreateConference() {
       return;
     }
 
+    const user = JSON.parse(localStorage.getItem("user"));
+    const userEmail = user?.email;
+
+    if (!userEmail) {
+      setMessage("⚠️ You must be logged in to create a conference.");
+      return;
+    }
+
     setLoading(true);
     setMessage("");
 
@@ -24,18 +32,24 @@ function CreateConference() {
       const response = await fetch("http://localhost:5000/api/conference/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, short_name: shortName, loca, dates }),
+        body: JSON.stringify({
+          title,
+          short_name: shortName,
+          loca,
+          dates,
+          userEmail
+        }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        setMessage("✅ Conference created successfully!");
+        setMessage("✅ Conference created and subscribed!");
         setTitle("");
         setShortName("");
         setLoca("");
         setDates("");
-        setShowModal(false); // Close popup
+        setShowModal(false);
       } else {
         setMessage(`❌ ${data.message || "Failed to create conference."}`);
       }

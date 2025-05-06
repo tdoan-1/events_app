@@ -1,15 +1,29 @@
 import React from "react";
 
-function WeekAtGlance({ conferences, talks, onDeleteConference, onFlagTalk, flaggedTalks }) {
+function WeekAtGlance({ conferences, talks, onDeleteConference, onFlagTalk, flaggedTalks, currentUserId }) {
   // Get current date and date one week from now
   const now = new Date();
   const oneWeekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
 
+  console.log("WeekAtGlance props:", { conferences, currentUserId }); // Debug log
+
   // Filter conferences and talks within the next week
   const upcomingConferences = conferences.filter(conf => {
     const confDate = new Date(conf.dates);
-    return confDate >= now && confDate <= oneWeekFromNow;
+    // Only include conferences where the user is a subscriber (role_id = 1)
+    const isSubscribed = conf.users?.some(user => 
+      user.user_id === currentUserId && user.role_id === 1
+    );
+    console.log("Conference check:", { 
+      confId: conf.conference_id, 
+      confDate, 
+      isSubscribed,
+      users: conf.users 
+    }); // Debug log
+    return confDate >= now && confDate <= oneWeekFromNow && isSubscribed;
   });
+
+  console.log("Filtered upcoming conferences:", upcomingConferences); // Debug log
 
   const upcomingTalks = talks.filter(talk => {
     const talkDate = new Date(talk.date);
@@ -26,7 +40,7 @@ function WeekAtGlance({ conferences, talks, onDeleteConference, onFlagTalk, flag
       
       <div className="glance-sections">
         <div className="glance-section conferences">
-          <h4>Upcoming Conferences</h4>
+          <h4>Your Upcoming Conferences</h4>
           {upcomingConferences.length === 0 ? (
             <p>No conferences scheduled for this week.</p>
           ) : (

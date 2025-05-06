@@ -14,17 +14,15 @@ function Home() {
 
   return (
     <div className="home-container">
-      <div className="left-panel">
+      {/* ✅ Reorder boxes to put Calendar in the center */}
+      <div className="top-row">
         <div className="box week-at-glance">
           <h3>Week at a Glance</h3>
           <div className="week-content">
-            {/* Week at a glance content will go here */}
             <p>Your weekly schedule will appear here.</p>
           </div>
         </div>
-      </div>
 
-      <div className="right-panel">
         <div className="box calendar-container">
           <Calendar />
         </div>

@@ -15,6 +15,7 @@ function Home() {
   const [newMessage, setNewMessage] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
   const [adminConferences, setAdminConferences] = useState([]);
+  const [subscribedConferences, setSubscribedConferences] = useState([]);
 
   // Get user from localStorage
   const user = JSON.parse(localStorage.getItem("user"));
@@ -115,6 +116,19 @@ function Home() {
         });
     }
   }, [selectedConference]);
+
+  // Add this useEffect to get subscribed conferences
+  useEffect(() => {
+    if (user?.id && conferences.length > 0) {
+      const subscribedConfs = conferences.filter(conf => 
+        conf.users?.some(u => 
+          u.user_id.toString().startsWith(user.id.toString()) && 
+          u.role_id === 1  // role_id 1 is for regular subscribers
+        )
+      );
+      setSubscribedConferences(subscribedConfs);
+    }
+  }, [conferences, user?.id]);
 
   const handleDeleteConference = async (conferenceId) => {
     if (!user?.id) {
@@ -260,11 +274,28 @@ function Home() {
                 className="conference-select"
               >
                 <option value="">Select a conference</option>
-                {adminConferences.map(conf => (
-                  <option key={conf.conference_id} value={conf.conference_id}>
-                    {conf.title}
-                  </option>
-                ))}
+                
+                {/* Admin Conferences Group */}
+                {adminConferences.length > 0 && (
+                  <optgroup label="My Admin Conferences">
+                    {adminConferences.map(conf => (
+                      <option key={conf.conference_id} value={conf.conference_id}>
+                        {conf.title} (Admin)
+                      </option>
+                    ))}
+                  </optgroup>
+                )}
+                
+                {/* Subscribed Conferences Group */}
+                {subscribedConferences.length > 0 && (
+                  <optgroup label="My Subscribed Conferences">
+                    {subscribedConferences.map(conf => (
+                      <option key={conf.conference_id} value={conf.conference_id}>
+                        {conf.title}
+                      </option>
+                    ))}
+                  </optgroup>
+                )}
               </select>
 
               {selectedConference && (

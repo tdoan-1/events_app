@@ -144,9 +144,9 @@ function WeekAtGlance({ conferences, talks, onDeleteConference, onFlagTalk, onUn
                 </p>
                 {/* Talks for this conference */}
                 {talksByConference[conference.conference_id] && talksByConference[conference.conference_id].length > 0 && (
-                  <ul style={{ marginTop: '0.5rem', marginLeft: '1.5rem', background: '#f8f9fa', borderRadius: '6px', padding: '0.75rem' }}>
+                  <ul style={{ marginTop: '0.5rem', marginLeft: 0, paddingLeft: '2.2em', background: '#f8f9fa', borderRadius: '6px', padding: '0.75rem' }}>
                     {talksByConference[conference.conference_id].map(talk => (
-                      <li key={talk.talks_id} style={{ marginBottom: '0.5rem', color: '#334155', listStyle: 'disc' }}>
+                      <li key={talk.talks_id} style={{ color: '#334155', listStyle: 'disc', marginBottom: '1.2em' }}>
                         <strong>{talk.abstract}</strong> <span style={{ color: '#64748b' }}>by {talk.authors}</span><br />
                         <span style={{ color: '#64748b' }}>🕒 {talk.time_ ? new Date(talk.time_).toLocaleTimeString() : 'N/A'}</span>
                         {talk.loca && <span style={{ color: '#64748b', marginLeft: '1rem' }}>📍 {talk.loca}</span>}
@@ -158,21 +158,22 @@ function WeekAtGlance({ conferences, talks, onDeleteConference, onFlagTalk, onUn
                           }
                           className={`flag-btn ${flaggedTalks.includes(talk.talks_id) ? 'flagged' : ''}`}
                           style={{
-                            marginLeft: '1rem',
+                            marginTop: '0.75em',
                             background: flaggedTalks.includes(talk.talks_id) ? '#facc15' : '#3b82f6',
                             color: 'white',
                             border: 'none',
                             borderRadius: '6px',
-                            padding: '0.35rem 0.85rem',
-                            fontWeight: 600,
-                            fontSize: '1rem',
+                            padding: '7px',
+                            marginLeft: '10px',
+                            fontWeight: 700,
+                            fontSize: '0.9rem',
                             cursor: 'pointer',
                             transition: 'background 0.2s',
                           }}
                           onMouseOver={e => e.currentTarget.style.background = flaggedTalks.includes(talk.talks_id) ? '#eab308' : '#2563eb'}
                           onMouseOut={e => e.currentTarget.style.background = flaggedTalks.includes(talk.talks_id) ? '#facc15' : '#3b82f6'}
                         >
-                          {flaggedTalks.includes(talk.talks_id) ? '🚩 Unflag' : '🚩 Flag'}
+                          <span style={{ marginRight: '0.5rem', fontSize: '1.2em' }}>🚩</span>{flaggedTalks.includes(talk.talks_id) ? 'Unflag' : 'Flag'}
                         </button>
                       </li>
                     ))}
@@ -214,14 +215,28 @@ function WeekAtGlance({ conferences, talks, onDeleteConference, onFlagTalk, onUn
                   {/* Flagged talks for this conference */}
                   {talksByConference[conference.conference_id] &&
                     talksByConference[conference.conference_id].filter(talk => flaggedTalks.includes(talk.talks_id)).length > 0 && (
-                      <ul style={{ marginTop: '0.5rem', marginLeft: '1.5rem', background: '#f8f9fa', borderRadius: '6px', padding: '0.75rem' }}>
+                      <ul style={{ marginTop: '0.5rem', marginLeft: 0, paddingLeft: '2.2em', background: '#f8f9fa', borderRadius: '6px', padding: '0.75rem' }}>
                         {talksByConference[conference.conference_id]
                           .filter(talk => flaggedTalks.includes(talk.talks_id))
                           .map(talk => (
-                            <li key={talk.talks_id} style={{ marginBottom: '0.5rem', color: '#334155', listStyle: 'disc' }}>
+                            <li key={talk.talks_id} style={{ color: '#334155', listStyle: 'disc', marginBottom: '1.2em' }}>
                               <strong>{talk.abstract}</strong> <span style={{ color: '#64748b' }}>by {talk.authors}</span><br />
                               <span style={{ color: '#64748b' }}>🕒 {talk.time_ ? new Date(talk.time_).toLocaleTimeString() : 'N/A'}</span>
                               {talk.loca && <span style={{ color: '#64748b', marginLeft: '1rem' }}>📍 {talk.loca}</span>}
+                              <button
+                                onClick={() => onUnflagTalk(talk.talks_id)}
+                                className="unsubscribe-btn"
+                                style={{
+                                  marginTop: '0.75em',
+                                  background: '#facc15',
+                                  color: 'white',
+                                  transition: 'background 0.2s',
+                                }}
+                                onMouseOver={e => e.currentTarget.style.background = '#eab308'}
+                                onMouseOut={e => e.currentTarget.style.background = '#facc15'}
+                              >
+                                <span style={{ marginRight: '0.5rem', fontSize: '1.2em' }}>🚩</span>Unflag
+                              </button>
                             </li>
                           ))}
                       </ul>
@@ -240,12 +255,18 @@ function WeekAtGlance({ conferences, talks, onDeleteConference, onFlagTalk, onUn
             background: "#3b82f6",
             color: "white",
             border: "none",
-            borderRadius: "6px",
-            padding: "0.5rem 1.25rem",
-            fontWeight: 500,
+            borderRadius: "10px",
+            padding: "1rem 2.5rem",
+            fontWeight: 700,
             cursor: "pointer",
-            fontSize: "1rem",
+            fontSize: "1.35rem",
+            boxShadow: "0 2px 8px rgba(59,130,246,0.15)",
+            letterSpacing: "0.03em",
+            transition: "background 0.2s, box-shadow 0.2s",
+            whiteSpace: "nowrap",
           }}
+          onMouseOver={e => e.currentTarget.style.background = "#2563eb"}
+          onMouseOut={e => e.currentTarget.style.background = "#3b82f6"}
         >
           Show All My Conferences
         </button>

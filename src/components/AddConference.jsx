@@ -15,6 +15,8 @@ function AddConference() {
   const [message, setMessage] = useState("");
   const [isCreating, setIsCreating] = useState(false);
   const [activeTab, setActiveTab] = useState("create"); // "create" or "list"
+  const [editingConference, setEditingConference] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -167,6 +169,72 @@ function AddConference() {
     }
   };
 
+  const handleEditClick = (conference) => {
+    setEditingConference(conference);
+    setTitle(conference.title);
+    setShortName(conference.short_name);
+    setLoca(conference.loca);
+    setDates(new Date(conference.dates).toISOString().split('T')[0]);
+    setIsEditing(true);
+    setActiveTab("create");
+  };
+
+  const handleUpdateConference = async (e) => {
+    e.preventDefault();
+    if (!title || !shortName || !loca || !dates) {
+      setMessage("All fields are required.");
+      return;
+    }
+
+    if (!user || !user.email) {
+      setMessage("You must be logged in to edit a conference.");
+      return;
+    }
+
+    setIsCreating(true);
+    setMessage("");
+
+    try {
+      const response = await fetch(`http://localhost:5000/api/conference/update/${editingConference.conference_id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title,
+          short_name: shortName,
+          loca,
+          dates,
+          userEmail: user.email
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setMessage("✅ Conference updated successfully!");
+        // Reset form
+        setTitle("");
+        setShortName("");
+        setLoca("");
+        setDates("");
+        setEditingConference(null);
+        setIsEditing(false);
+        // Refresh the conferences list
+        const updatedConferences = await fetch("http://localhost:5000/api/conference/list")
+          .then(res => res.json());
+        setConferences(updatedConferences);
+        // Switch to the list tab
+        setActiveTab("list");
+      } else {
+        setMessage(`❌ ${data.message || "Failed to update conference."}`);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setMessage("❌ An error occurred. Try again.");
+    }
+
+    setIsCreating(false);
+  };
+
   if (loading) {
     return <div className="loading">Loading conferences...</div>;
   }
@@ -194,8 +262,8 @@ function AddConference() {
 
       {activeTab === "create" && (
         <div className="add-conference-container">
-          <h2>Create New Conference</h2>
-          <form onSubmit={handleCreateConference} className="conference-form">
+          <h2>{isEditing ? "Edit Conference" : "Create New Conference"}</h2>
+          <form onSubmit={isEditing ? handleUpdateConference : handleCreateConference} className="conference-form">
             <div className="form-group">
               <label htmlFor="title">Conference Title</label>
               <input
@@ -240,8 +308,24 @@ function AddConference() {
             </div>
 
             <button type="submit" className="submit-btn" disabled={isCreating}>
-              {isCreating ? "Creating..." : "Create Conference"}
+              {isCreating ? (isEditing ? "Updating..." : "Creating...") : (isEditing ? "Update Conference" : "Create Conference")}
             </button>
+            {isEditing && (
+              <button 
+                type="button" 
+                className="cancel-btn" 
+                onClick={() => {
+                  setIsEditing(false);
+                  setEditingConference(null);
+                  setTitle("");
+                  setShortName("");
+                  setLoca("");
+                  setDates("");
+                }}
+              >
+                Cancel Edit
+              </button>
+            )}
           </form>
           {message && <p className="status-message">{message}</p>}
         </div>
@@ -265,6 +349,17 @@ function AddConference() {
                   </p>
                 </div>
                 <div className="conference-actions">
+                  {conference.users?.some(u => 
+                    u.user_id.toString().startsWith(user?.id?.toString()) && 
+                    u.role_id === 2
+                  ) ? (
+                    <button
+                      className="edit-btn"
+                      onClick={() => handleEditClick(conference)}
+                    >
+                      Edit Conference
+                    </button>
+                  ) : null}
                   {subscribedConferences.includes(conference.conference_id) ? (
                     <button
                       className="unsubscribe-btn"

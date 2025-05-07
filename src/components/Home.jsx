@@ -3,6 +3,7 @@ import Calendar from "./Calendar";
 import WeekAtGlance from "./WeekAtGlance";
 import "./Home.css";
 import { getConferences } from "../api";
+import { useNavigate } from "react-router-dom";
 
 function Home() {
   const [currentDateTime, setCurrentDateTime] = useState("");
@@ -17,6 +18,8 @@ function Home() {
   const [adminConferences, setAdminConferences] = useState([]);
   const [subscribedConferences, setSubscribedConferences] = useState([]);
   const [allMessages, setAllMessages] = useState([]);
+
+  const navigate = useNavigate();
 
   // Get user from localStorage
   const user = JSON.parse(localStorage.getItem("user"));
@@ -266,6 +269,22 @@ function Home() {
     }
   };
 
+  const handleEditConference = (conference) => {
+    try {
+      console.log("Editing conference:", conference);
+      // Navigate to the AddConference page with the conference data
+      navigate('/add-conference', { 
+        state: { 
+          conference: conference,
+          isEditing: true 
+        }
+      });
+    } catch (error) {
+      console.error("Error in handleEditConference:", error);
+      alert("An error occurred while preparing to edit the conference. Please try again.");
+    }
+  };
+
   return (
     <div className="home-container">
       <div className="top-row">
@@ -277,7 +296,7 @@ function Home() {
             onFlagTalk={handleFlagTalk}
             onUnflagTalk={handleUnflagTalk}
             flaggedTalks={flaggedTalks}
-            currentUserId={currentUserId}
+            onEditConference={handleEditConference}
           />
         </div>
 
@@ -290,8 +309,8 @@ function Home() {
           {isAdmin ? (
             <div className="admin-messages">
               <select 
-                value={selectedConference || ""} 
-                onChange={(e) => setSelectedConference(Number(e.target.value))}
+                value={selectedConference === null ? "" : selectedConference} 
+                onChange={(e) => setSelectedConference(e.target.value ? Number(e.target.value) : null)}
                 className="conference-select"
               >
                 <option value="">All Conferences</option>

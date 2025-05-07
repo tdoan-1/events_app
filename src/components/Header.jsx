@@ -85,7 +85,7 @@ function Header() {
 
       {userEmail && (
         <div className="user-info">
-          <div className="user-email">Logged in as: <h7>{userEmail}</h7></div>
+          <div className="user-email">Logged in as: <span className="email-text">{userEmail}</span></div>
           <button className="logout-btn" onClick={handleLogout}>Log Out</button>
         </div>
       )}

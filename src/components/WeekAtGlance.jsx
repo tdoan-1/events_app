@@ -204,7 +204,9 @@ function WeekAtGlance({ conferences, talks, onDeleteConference, onFlagTalk, onUn
                 <li key={conf.conference_id} className="glance-item">
                   <div className="item-header">
                     <h5>{conf.title}</h5>
-                    <button onClick={() => handleUnsubscribe(conf.conference_id)} className="unsubscribe-btn">Unsubscribe</button>
+                    <button onClick={() => handleUnsubscribe(conf.conference_id)} className="unsubscribe-btn">
+                      Unsubscribe
+                    </button>
                   </div>
                   <p className="item-details">
                     <span>📍 {conf.loca}  📅 {new Date(conf.dates).toLocaleDateString()}</span>

@@ -116,9 +116,34 @@ function Home() {
     }
   }, [selectedConference]);
 
-  const handleDeleteConference = (conferenceId) => {
-    // TODO: Implement unsubscribe functionality
-    console.log("Unsubscribe from conference:", conferenceId);
+  const handleDeleteConference = async (conferenceId) => {
+    if (!user?.id) {
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:5000/api/conference/unsubscribe", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          conferenceId: conferenceId,
+          userEmail: user.email
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to unsubscribe from conference");
+      }
+
+      // Update the conferences list by removing the unsubscribed conference
+      setConferences(prevConferences => 
+        prevConferences.filter(conf => conf.conference_id !== conferenceId)
+      );
+    } catch (error) {
+      console.error("Error unsubscribing from conference:", error);
+    }
   };
 
   // Flag a talk

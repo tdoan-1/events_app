@@ -109,7 +109,6 @@ function AddConference() {
 
   const handleSubscribe = async (conferenceId) => {
     if (!user) {
-      alert("Please log in to subscribe to conferences");
       return;
     }
 
@@ -133,16 +132,13 @@ function AddConference() {
 
       // Update subscribed conferences list
       setSubscribedConferences(prev => [...prev, conferenceId]);
-      alert("Successfully subscribed to conference!");
     } catch (error) {
       console.error("Error subscribing to conference:", error);
-      alert("Failed to subscribe to conference. Please try again.");
     }
   };
 
   const handleUnsubscribe = async (conferenceId) => {
     if (!user) {
-      alert("Please log in to unsubscribe from conferences");
       return;
     }
 
@@ -166,10 +162,8 @@ function AddConference() {
 
       // Update subscribed conferences list
       setSubscribedConferences(prev => prev.filter(id => id !== conferenceId));
-      alert("Successfully unsubscribed from conference!");
     } catch (error) {
       console.error("Error unsubscribing from conference:", error);
-      alert("Failed to unsubscribe from conference. Please try again.");
     }
   };
 

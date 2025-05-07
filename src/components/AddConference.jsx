@@ -61,7 +61,7 @@ function AddConference() {
       return;
     }
 
-    if (!user || !user.id) {
+    if (!user || !user.email) {
       setMessage("You must be logged in to create a conference.");
       return;
     }
@@ -78,7 +78,7 @@ function AddConference() {
           short_name: shortName,
           loca,
           dates,
-          user_id: user.id
+          userEmail: user.email
         }),
       });
 

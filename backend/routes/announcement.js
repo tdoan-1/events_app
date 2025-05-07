@@ -8,18 +8,21 @@ router.get('/conference/:conferenceId', async (req, res) => {
   const { conferenceId } = req.params;
 
   try {
-    const announcements = await prisma.announcement.findMany({
+    const reminders = await prisma.reminder.findMany({
       where: {
         conference_id: parseInt(conferenceId)
       },
-      include: {
-        user: true,
-        conference: true
-      },
       orderBy: {
-        created_at: 'desc'
+        reminder_id: 'desc'
       }
     });
+
+    // Transform reminders to match the expected announcement format
+    const announcements = reminders.map(reminder => ({
+      announcement_id: reminder.reminder_id,
+      announcement_desc: reminder.title,
+      created_at: reminder.Event_time
+    }));
 
     res.json(announcements);
   } catch (error) {
@@ -37,28 +40,33 @@ router.post('/create', async (req, res) => {
   }
 
   try {
-    // Check if user is an admin for this conference
-    const userRole = await prisma.users.findFirst({
+    // Get all users for this conference
+    const allUsers = await prisma.users.findMany({
       where: {
-        user_id: parseInt(user_id),
-        conference_id: parseInt(conference_id),
-        role_id: 2 // Admin role
+        conference_id: parseInt(conference_id)
       }
     });
+
+    // Check if any user entry matches the pattern
+    const userRole = allUsers.find(u => 
+      u.user_id.toString().startsWith(user_id.toString()) && 
+      u.role_id === 2
+    );
 
     if (!userRole) {
       return res.status(403).json({ message: "Only admins can create announcements" });
     }
 
-    const announcement = await prisma.announcement.create({
+    // Create reminder with the message content
+    const reminder = await prisma.reminder.create({
       data: {
         conference_id: parseInt(conference_id),
-        user_id: parseInt(user_id),
-        announcement_desc
+        title: announcement_desc,
+        Event_time: new Date()
       }
     });
 
-    res.status(201).json(announcement);
+    res.status(201).json(reminder);
   } catch (error) {
     console.error("Error creating announcement:", error);
     res.status(500).json({ message: "Failed to create announcement." });

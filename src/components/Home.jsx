@@ -16,6 +16,7 @@ function Home() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [adminConferences, setAdminConferences] = useState([]);
   const [subscribedConferences, setSubscribedConferences] = useState([]);
+  const [allMessages, setAllMessages] = useState([]);
 
   // Get user from localStorage
   const user = JSON.parse(localStorage.getItem("user"));
@@ -129,6 +130,34 @@ function Home() {
       setSubscribedConferences(subscribedConfs);
     }
   }, [conferences, user?.id]);
+
+  // Add this new useEffect to fetch all messages
+  useEffect(() => {
+    if (user?.id) {
+      // Fetch messages for all subscribed and admin conferences
+      const fetchAllMessages = async () => {
+        try {
+          const allConfs = [...adminConferences, ...subscribedConferences];
+          const messagesPromises = allConfs.map(conf => 
+            fetch(`http://localhost:5000/api/announcement/conference/${conf.conference_id}`)
+              .then(res => res.json())
+              .then(data => data.map(msg => ({
+                ...msg,
+                conference_title: conf.title
+              })))
+          );
+          
+          const messagesArrays = await Promise.all(messagesPromises);
+          const allMsgs = messagesArrays.flat();
+          setAllMessages(allMsgs);
+        } catch (err) {
+          console.error("Failed to fetch all messages:", err);
+        }
+      };
+
+      fetchAllMessages();
+    }
+  }, [adminConferences, subscribedConferences, user?.id]);
 
   const handleDeleteConference = async (conferenceId) => {
     if (!user?.id) {
@@ -258,14 +287,6 @@ function Home() {
 
         <div className="box messages">
           <h3>Messages</h3>
-          <div style={{ fontSize: '12px', color: 'gray', marginBottom: '10px' }}>
-            <p>Debug Info:</p>
-            <p>Is Admin: {isAdmin ? 'Yes' : 'No'}</p>
-            <p>User ID: {user?.id || 'Not logged in'}</p>
-            <p>Selected Conference: {selectedConference || 'None'}</p>
-            <p>Admin Conferences: {adminConferences.map(c => c.title).join(', ') || 'None'}</p>
-          </div>
-
           {isAdmin ? (
             <div className="admin-messages">
               <select 
@@ -273,7 +294,7 @@ function Home() {
                 onChange={(e) => setSelectedConference(Number(e.target.value))}
                 className="conference-select"
               >
-                <option value="">Select a conference</option>
+                <option value="">All Conferences</option>
                 
                 {/* Admin Conferences Group */}
                 {adminConferences.length > 0 && (
@@ -311,26 +332,40 @@ function Home() {
               )}
 
               <div className="message-list">
-                {messages.map(msg => (
-                  <div key={msg.announcement_id} className="message-item">
-                    <p className="message-content">{msg.announcement_desc}</p>
-                    <small className="message-time">
-                      {new Date(msg.created_at).toLocaleString()}
-                    </small>
-                  </div>
-                ))}
+                {(selectedConference ? messages : allMessages)
+                  .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                  .map(msg => (
+                    <div key={msg.announcement_id} className="message-item">
+                      <p className="message-content">{msg.announcement_desc}</p>
+                      <div className="message-meta">
+                        <small className="message-conference">
+                          {msg.conference_title || 'Unknown Conference'}
+                        </small>
+                        <small className="message-time">
+                          {new Date(msg.created_at).toLocaleString()}
+                        </small>
+                      </div>
+                    </div>
+                  ))}
               </div>
             </div>
           ) : (
             <div className="user-messages">
-              {messages.map(msg => (
-                <div key={msg.announcement_id} className="message-item">
-                  <p className="message-content">{msg.announcement_desc}</p>
-                  <small className="message-time">
-                    {new Date(msg.created_at).toLocaleString()}
-                  </small>
-                </div>
-              ))}
+              {(selectedConference ? messages : allMessages)
+                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                .map(msg => (
+                  <div key={msg.announcement_id} className="message-item">
+                    <p className="message-content">{msg.announcement_desc}</p>
+                    <div className="message-meta">
+                      <small className="message-conference">
+                        {msg.conference_title || 'Unknown Conference'}
+                      </small>
+                      <small className="message-time">
+                        {new Date(msg.created_at).toLocaleString()}
+                      </small>
+                    </div>
+                  </div>
+                ))}
             </div>
           )}
         </div>

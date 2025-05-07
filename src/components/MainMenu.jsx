@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import './MainMenu.css';
 
@@ -8,7 +8,52 @@ function MainMenu() {
   const [isCodeSent, setIsCodeSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [currentFact, setCurrentFact] = useState("");
   const navigate = useNavigate();
+
+  // Array of computer science facts
+  const computerScienceFacts = [
+    "The first computer programmer was Ada Lovelace, who wrote the first algorithm intended to be processed by a machine in the 1840s.",
+    "The term 'bug' in computer science was coined by Grace Hopper when she found an actual bug (a moth) causing problems in the Harvard Mark II computer.",
+    "The first computer mouse was made of wood and was invented by Doug Engelbart in 1964.",
+    "The first computer virus was created in 1971 and was called 'Creeper'.",
+    "The first computer to use a mouse and a graphical user interface (GUI) was the Xerox Alto, developed in 1973.",
+    "The first computer to be called a 'personal computer' was the Programma 101, released in 1965.",
+    "The first computer to use a hard disk drive was the IBM 305 RAMAC in 1956.",
+    "The first computer to use a microprocessor was the Intel 4004, released in 1971.",
+    "The first computer to use a graphical user interface (GUI) was the Xerox Alto, developed in 1973.",
+    "The first computer to use a mouse was the Xerox Alto, developed in 1973.",
+    "The first computer to use a hard disk drive was the IBM 305 RAMAC in 1956.",
+    "The first computer to use a microprocessor was the Intel 4004, released in 1971.",
+    "The first computer to use a graphical user interface (GUI) was the Xerox Alto, developed in 1973.",
+    "The first computer to use a mouse was the Xerox Alto, developed in 1973.",
+    "The first computer to use a hard disk drive was the IBM 305 RAMAC in 1956.",
+    "The first computer to use a microprocessor was the Intel 4004, released in 1971.",
+    "The first computer to use a graphical user interface (GUI) was the Xerox Alto, developed in 1973.",
+    "The first computer to use a mouse was the Xerox Alto, developed in 1973.",
+    "The first computer to use a hard disk drive was the IBM 305 RAMAC in 1956.",
+    "The first computer to use a microprocessor was the Intel 4004, released in 1971."
+  ];
+
+  // Function to get a random fact
+  const getRandomFact = () => {
+    const randomIndex = Math.floor(Math.random() * computerScienceFacts.length);
+    return computerScienceFacts[randomIndex];
+  };
+
+  // Set up the fact rotation
+  useEffect(() => {
+    // Set initial fact
+    setCurrentFact(getRandomFact());
+
+    // Rotate facts every 10 seconds
+    const interval = setInterval(() => {
+      setCurrentFact(getRandomFact());
+    }, 10000);
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(interval);
+  }, []);
 
   const validateEmail = (email) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -84,6 +129,13 @@ function MainMenu() {
   return (
     <div className="main-menu">
       <h1>Welcome</h1>
+      
+      {/* Add the fact display */}
+      <div className="fact-display">
+        <h3>Did You Know?</h3>
+        <p className="fact-text">{currentFact}</p>
+      </div>
+
       <div className="login-container">
         {!isCodeSent ? (
           <>

@@ -37,6 +37,11 @@ function Header() {
     navigate("/home");
   };
 
+  const handleMainMenuClick = () => {
+    setIsMenuOpen(false);
+    navigate("/");
+  };
+
   // Check if we're on the main menu (root path)
   const isMainMenu = location.pathname === "/";
 
@@ -72,6 +77,9 @@ function Header() {
           <Link to="/add-talk" className="menu-item" onClick={() => setIsMenuOpen(false)}>
             Add Talk
           </Link>
+          <button className="menu-item main-menu-button" onClick={handleMainMenuClick}>
+            Return to Main Menu
+          </button>
         </div>
       </div>
 

@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from "react";
 import Calendar from "./Calendar";
+import WeekAtGlance from "./WeekAtGlance";
 import "./Home.css";
+import { getConferences } from "../api";
 
 function Home() {
   const [currentDateTime, setCurrentDateTime] = useState("");
+  const [conferences, setConferences] = useState([]);
+  const [talks, setTalks] = useState([]);
+  const [flaggedTalks, setFlaggedTalks] = useState([]);
+  const [currentUserId, setCurrentUserId] = useState(1); // TODO: Get this from your auth system
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -12,15 +18,46 @@ function Home() {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    getConferences().then((data) => {
+      console.log("Fetched conferences:", data); // Debug log
+      setConferences(data);
+    }).catch(error => {
+      console.error("Error fetching conferences:", error); // Debug log
+    });
+  }, []);
+
+  // Debug log for conferences state
+  useEffect(() => {
+    console.log("Current conferences state:", conferences);
+  }, [conferences]);
+
+  const handleDeleteConference = (conferenceId) => {
+    // TODO: Implement unsubscribe functionality
+    console.log("Unsubscribe from conference:", conferenceId);
+  };
+
+  const handleFlagTalk = (talkId) => {
+    setFlaggedTalks(prev => 
+      prev.includes(talkId) 
+        ? prev.filter(id => id !== talkId)
+        : [...prev, talkId]
+    );
+  };
+
   return (
     <div className="home-container">
       {/* ✅ Reorder boxes to put Calendar in the center */}
       <div className="top-row">
         <div className="box week-at-glance">
-          <h3>Week at a Glance</h3>
-          <div className="week-content">
-            <p>Your weekly schedule will appear here.</p>
-          </div>
+          <WeekAtGlance 
+            conferences={conferences}
+            talks={talks}
+            onDeleteConference={handleDeleteConference}
+            onFlagTalk={handleFlagTalk}
+            flaggedTalks={flaggedTalks}
+            currentUserId={currentUserId}
+          />
         </div>
 
         <div className="box calendar-container">

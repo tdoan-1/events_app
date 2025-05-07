@@ -188,7 +188,7 @@ function AddConference() {
           className={`tab-button ${activeTab === "create" ? "active" : ""}`}
           onClick={() => setActiveTab("create")}
         >
-          Create Manually
+          Create Conference
         </button>
         <button
           className={`tab-button ${activeTab === "list" ? "active" : ""}`}

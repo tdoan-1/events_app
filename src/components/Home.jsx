@@ -42,6 +42,16 @@ function Home() {
       });
   }, []);
 
+  // Fetch flagged talks for the user on load
+  useEffect(() => {
+    if (user?.id) {
+      fetch(`http://localhost:5000/api/talk/flagged?user_id=${user.id}`)
+        .then(res => res.json())
+        .then(data => setFlaggedTalks(data.map(t => t.talks_id)))
+        .catch(err => console.error("Failed to fetch flagged talks:", err));
+    }
+  }, [user?.id]);
+
   // Debug log for conferences state
   useEffect(() => {
     console.log("Current conferences state:", conferences);

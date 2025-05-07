@@ -104,5 +104,21 @@ router.delete('/unflag', async (req, res) => {
   }
 });
 
+// API to get flagged talks for a user
+router.get('/flagged', async (req, res) => {
+  const { user_id } = req.query;
+  if (!user_id) return res.status(400).json({ message: "Missing user_id" });
+
+  try {
+    const flagged = await prisma.own_talks.findMany({
+      where: { user_id: parseInt(user_id) }
+    });
+    res.json(flagged);
+  } catch (error) {
+    console.error("Error fetching flagged talks:", error);
+    res.status(500).json({ message: "Failed to fetch flagged talks." });
+  }
+});
+
 // Export the router to use in `server.js`
 module.exports = router;

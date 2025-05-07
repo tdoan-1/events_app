@@ -211,6 +211,21 @@ function WeekAtGlance({ conferences, talks, onDeleteConference, onFlagTalk, onUn
                   <p className="item-details">
                     <span>📍 {conference.loca}  📅 {new Date(conference.dates).toLocaleDateString()}</span>
                   </p>
+                  {/* Flagged talks for this conference */}
+                  {talksByConference[conference.conference_id] &&
+                    talksByConference[conference.conference_id].filter(talk => flaggedTalks.includes(talk.talks_id)).length > 0 && (
+                      <ul style={{ marginTop: '0.5rem', marginLeft: '1.5rem', background: '#f8f9fa', borderRadius: '6px', padding: '0.75rem' }}>
+                        {talksByConference[conference.conference_id]
+                          .filter(talk => flaggedTalks.includes(talk.talks_id))
+                          .map(talk => (
+                            <li key={talk.talks_id} style={{ marginBottom: '0.5rem', color: '#334155', listStyle: 'disc' }}>
+                              <strong>{talk.abstract}</strong> <span style={{ color: '#64748b' }}>by {talk.authors}</span><br />
+                              <span style={{ color: '#64748b' }}>🕒 {talk.time_ ? new Date(talk.time_).toLocaleTimeString() : 'N/A'}</span>
+                              {talk.loca && <span style={{ color: '#64748b', marginLeft: '1rem' }}>📍 {talk.loca}</span>}
+                            </li>
+                          ))}
+                      </ul>
+                  )}
                 </li>
               ))}
             </ul>

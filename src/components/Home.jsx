@@ -19,12 +19,24 @@ function Home() {
   }, []);
 
   useEffect(() => {
+    // Fetch conferences
     getConferences().then((data) => {
-      console.log("Fetched conferences:", data); // Debug log
+      console.log("Fetched conferences:", data);
       setConferences(data);
     }).catch(error => {
-      console.error("Error fetching conferences:", error); // Debug log
+      console.error("Error fetching conferences:", error);
     });
+
+    // Fetch talks
+    fetch("http://localhost:5000/api/talk/list")
+      .then(response => response.json())
+      .then(data => {
+        console.log("Fetched talks:", data);
+        setTalks(data);
+      })
+      .catch(error => {
+        console.error("Error fetching talks:", error);
+      });
   }, []);
 
   // Debug log for conferences state
@@ -47,7 +59,6 @@ function Home() {
 
   return (
     <div className="home-container">
-      {/* ✅ Reorder boxes to put Calendar in the center */}
       <div className="top-row">
         <div className="box week-at-glance">
           <WeekAtGlance 

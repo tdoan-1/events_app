@@ -23,7 +23,7 @@ function WeekAtGlance({ conferences, talks, onDeleteConference, onFlagTalk, onUn
     const confDate = new Date(conf.dates);
     const isSubscribed = conf.users?.some(user => {
       const userIdStr = String(user.user_id);
-      return user.role_id === 1 && userIdStr.startsWith(currentUserBaseId);
+      return (user.role_id === 1 || user.role_id === 2) && userIdStr.startsWith(currentUserBaseId);
     });
     return { isSubscribed, confDate };
   };
@@ -31,12 +31,12 @@ function WeekAtGlance({ conferences, talks, onDeleteConference, onFlagTalk, onUn
   const upcomingConferences = conferences.filter(conf => {
     const { isSubscribed, confDate } = isUserSubscribed(conf);
     return confDate >= now && confDate <= oneWeekFromNow && isSubscribed;
-  });
+  }).sort((a, b) => new Date(a.dates) - new Date(b.dates));
 
   const allActiveConferences = conferences.filter(conf => {
     const { isSubscribed, confDate } = isUserSubscribed(conf);
     return confDate >= now && isSubscribed;
-  });
+  }).sort((a, b) => new Date(a.dates) - new Date(b.dates));
 
   const talksByConferenceFlagged = {};
   talks

@@ -14,10 +14,26 @@
   display: flex;
   align-items: center;
   gap: 1rem;
+  flex: 1;
+}
+
+.header-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+}
+
+.app-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0;
+  letter-spacing: 0.5px;
 }
 
 .header-title {
-  font-size: 1.75rem;
+  font-size: 1.5rem;
   font-weight: 600;
   color: #2c3e50;
   letter-spacing: 0.5px;
@@ -163,6 +179,10 @@ h7 {
   }
 
   .header-title {
+    font-size: 1.25rem;
+  }
+
+  .app-title {
     font-size: 1.5rem;
   }
 

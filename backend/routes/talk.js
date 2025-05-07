@@ -79,6 +79,46 @@ router.post('/flag', async (req, res) => {
     }
   });
   
+// API to unflag talks
+router.delete('/unflag', async (req, res) => {
+  const { user_id, talks_id } = req.body;
+
+  if (!user_id || !talks_id) {
+    return res.status(400).json({ message: "Missing user_id or talks_id" });
+  }
+
+  try {
+    const deleted = await prisma.own_talks.deleteMany({
+      where: {
+        user_id: parseInt(user_id),
+        talks_id: parseInt(talks_id)
+      }
+    });
+    if (deleted.count === 0) {
+      return res.status(404).json({ message: "Flag not found." });
+    }
+    res.status(200).json({ message: "Talk unflagged successfully." });
+  } catch (error) {
+    console.error("Error unflagging talk:", error);
+    res.status(500).json({ message: "Failed to unflag talk." });
+  }
+});
+
+// API to get flagged talks for a user
+router.get('/flagged', async (req, res) => {
+  const { user_id } = req.query;
+  if (!user_id) return res.status(400).json({ message: "Missing user_id" });
+
+  try {
+    const flagged = await prisma.own_talks.findMany({
+      where: { user_id: parseInt(user_id) }
+    });
+    res.json(flagged);
+  } catch (error) {
+    console.error("Error fetching flagged talks:", error);
+    res.status(500).json({ message: "Failed to fetch flagged talks." });
+  }
+});
 
 // Export the router to use in `server.js`
 module.exports = router;

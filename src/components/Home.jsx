@@ -11,6 +11,9 @@ function Home() {
   const [flaggedTalks, setFlaggedTalks] = useState([]);
   const [currentUserId, setCurrentUserId] = useState(1); // TODO: Get this from your auth system
 
+  // Get user from localStorage
+  const user = JSON.parse(localStorage.getItem("user"));
+
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentDateTime(new Date().toLocaleString());
@@ -39,6 +42,16 @@ function Home() {
       });
   }, []);
 
+  // Fetch flagged talks for the user on load
+  useEffect(() => {
+    if (user?.id) {
+      fetch(`http://localhost:5000/api/talk/flagged?user_id=${user.id}`)
+        .then(res => res.json())
+        .then(data => setFlaggedTalks(data.map(t => t.talks_id)))
+        .catch(err => console.error("Failed to fetch flagged talks:", err));
+    }
+  }, [user?.id]);
+
   // Debug log for conferences state
   useEffect(() => {
     console.log("Current conferences state:", conferences);
@@ -49,12 +62,36 @@ function Home() {
     console.log("Unsubscribe from conference:", conferenceId);
   };
 
-  const handleFlagTalk = (talkId) => {
-    setFlaggedTalks(prev => 
-      prev.includes(talkId) 
-        ? prev.filter(id => id !== talkId)
-        : [...prev, talkId]
-    );
+  // Flag a talk
+  const handleFlagTalk = async (talkId) => {
+    if (!user?.id) return alert("User not found.");
+    try {
+      const res = await fetch("http://localhost:5000/api/talk/flag", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: user.id, talks_id: talkId }),
+      });
+      if (!res.ok) throw new Error("Failed to flag talk");
+      setFlaggedTalks(prev => [...prev, talkId]);
+    } catch (err) {
+      alert("Error flagging talk: " + err.message);
+    }
+  };
+
+  // Unflag a talk
+  const handleUnflagTalk = async (talkId) => {
+    if (!user?.id) return alert("User not found.");
+    try {
+      const res = await fetch("http://localhost:5000/api/talk/unflag", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: user.id, talks_id: talkId }),
+      });
+      if (!res.ok) throw new Error("Failed to unflag talk");
+      setFlaggedTalks(prev => prev.filter(id => id !== talkId));
+    } catch (err) {
+      alert("Error unflagging talk: " + err.message);
+    }
   };
 
   return (
@@ -66,6 +103,7 @@ function Home() {
             talks={talks}
             onDeleteConference={handleDeleteConference}
             onFlagTalk={handleFlagTalk}
+            onUnflagTalk={handleUnflagTalk}
             flaggedTalks={flaggedTalks}
             currentUserId={currentUserId}
           />

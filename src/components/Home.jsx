@@ -253,7 +253,7 @@ function Home() {
         </div>
 
         <div className="box calendar-container">
-          <Calendar />
+          <Calendar conferences={subscribedConferences} />
         </div>
 
         <div className="box messages">

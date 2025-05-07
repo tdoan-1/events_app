@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 
-function WeekAtGlance({ conferences, talks, onDeleteConference, onFlagTalk, flaggedTalks }) {
+function WeekAtGlance({ conferences, talks, onDeleteConference, onFlagTalk, onUnflagTalk, flaggedTalks }) {
   const [showAll, setShowAll] = useState(false);
   const [currentUserBaseId, setCurrentUserBaseId] = useState("");
 
@@ -140,8 +140,7 @@ function WeekAtGlance({ conferences, talks, onDeleteConference, onFlagTalk, flag
                   </button>
                 </div>
                 <p className="item-details">
-                  <span>📍 {conference.loca}</span>
-                  <span>📅 {new Date(conference.dates).toLocaleDateString()}</span>
+                  <span>📍 {conference.loca}  📅 {new Date(conference.dates).toLocaleDateString()}</span>
                 </p>
                 {/* Talks for this conference */}
                 {talksByConference[conference.conference_id] && talksByConference[conference.conference_id].length > 0 && (
@@ -151,6 +150,30 @@ function WeekAtGlance({ conferences, talks, onDeleteConference, onFlagTalk, flag
                         <strong>{talk.abstract}</strong> <span style={{ color: '#64748b' }}>by {talk.authors}</span><br />
                         <span style={{ color: '#64748b' }}>🕒 {talk.time_ ? new Date(talk.time_).toLocaleTimeString() : 'N/A'}</span>
                         {talk.loca && <span style={{ color: '#64748b', marginLeft: '1rem' }}>📍 {talk.loca}</span>}
+                        <button
+                          onClick={() =>
+                            flaggedTalks.includes(talk.talks_id)
+                              ? onUnflagTalk(talk.talks_id)
+                              : onFlagTalk(talk.talks_id)
+                          }
+                          className={`flag-btn ${flaggedTalks.includes(talk.talks_id) ? 'flagged' : ''}`}
+                          style={{
+                            marginLeft: '1rem',
+                            background: flaggedTalks.includes(talk.talks_id) ? '#facc15' : '#3b82f6',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '6px',
+                            padding: '0.35rem 0.85rem',
+                            fontWeight: 600,
+                            fontSize: '1rem',
+                            cursor: 'pointer',
+                            transition: 'background 0.2s',
+                          }}
+                          onMouseOver={e => e.currentTarget.style.background = flaggedTalks.includes(talk.talks_id) ? '#eab308' : '#2563eb'}
+                          onMouseOut={e => e.currentTarget.style.background = flaggedTalks.includes(talk.talks_id) ? '#facc15' : '#3b82f6'}
+                        >
+                          {flaggedTalks.includes(talk.talks_id) ? '🚩 Unflag' : '🚩 Flag'}
+                        </button>
                       </li>
                     ))}
                   </ul>
@@ -186,37 +209,7 @@ function WeekAtGlance({ conferences, talks, onDeleteConference, onFlagTalk, flag
                     </button>
                   </div>
                   <p className="item-details">
-                    <span>📍 {conference.loca}</span>
-                    <span>📅 {new Date(conference.dates).toLocaleDateString()}</span>
-                  </p>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-
-        <div className="glance-section talks">
-          <h4>Your Upcoming Talks</h4>
-          {upcomingTalks.length === 0 ? (
-            <p>No talks scheduled for this week.</p>
-          ) : (
-            <ul>
-              {upcomingTalks.map((talk) => (
-                <li key={talk.talks_id} className="glance-item">
-                  <div className="item-header">
-                    <h5>{talk.abstract}</h5>
-                    <button
-                      onClick={() => onFlagTalk(talk.talks_id)}
-                      className={`flag-btn ${flaggedTalks.includes(talk.talks_id) ? "flagged" : ""}`}
-                    >
-                      {flaggedTalks.includes(talk.talks_id) ? "★" : "☆"}
-                    </button>
-                  </div>
-                  <p className="item-details">
-                    <span>👤 {talk.authors}</span>
-                    <span>📅 {new Date(talk.time_).toLocaleDateString()}</span>
-                    <span>⏰ {new Date(talk.time_).toLocaleTimeString()}</span>
-                    <span>📍 {talk.loca}</span>
+                    <span>📍 {conference.loca}  📅 {new Date(conference.dates).toLocaleDateString()}</span>
                   </p>
                 </li>
               ))}

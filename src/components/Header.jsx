@@ -15,6 +15,14 @@ function Header() {
     }
   }, []);
 
+  const getPageTitle = () => {
+    const path = location.pathname;
+    if (path === "/home") return "Home";
+    if (path === "/add-conference") return "Add Conference";
+    if (path === "/add-talk") return "Add Talk";
+    return "Events Planner";
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("user");
     window.location.href = "/"; // This refreshes the page and navigates to the main menu
@@ -42,7 +50,11 @@ function Header() {
             <span></span>
           </button>
         )}
-        <h1 className="header-title">Events Planner</h1>
+        <h1 className="header-title">{getPageTitle()}</h1>
+      </div>
+
+      <div className="header-center">
+        <h1 className="app-title">Events App</h1>
       </div>
 
       <div className={`side-menu ${isMenuOpen ? 'open' : ''}`}>

@@ -96,8 +96,8 @@ function WeekAtGlance({ conferences, talks, onDeleteConference, onFlagTalk, onUn
           {confTalks.map(talk => (
             <li key={talk.talks_id} style={{ color: '#334155', listStyle: 'disc', marginBottom: '1.2em' }}>
               <strong>{talk.abstract}</strong> <span style={{ color: '#64748b' }}>by {talk.authors}</span><br />
-              <span style={{ color: '#64748b' }}>🕒 {talk.time_ ? new Date(talk.time_).toLocaleTimeString() : 'N/A'}</span>
-              {talk.loca && <span style={{ color: '#64748b', marginLeft: '1rem' }}>📍 {talk.loca}</span>}
+              <span style={{ color: '#64748b' }}> {talk.time_ ? new Date(talk.time_).toLocaleTimeString() : 'N/A'}</span>
+              {talk.loca && <span style={{ color: '#64748b', marginLeft: '1rem' }}> {talk.loca}</span>}
               <button
                 onClick={() =>
                   flaggedTalks.includes(talk.talks_id)
@@ -112,7 +112,7 @@ function WeekAtGlance({ conferences, talks, onDeleteConference, onFlagTalk, onUn
                   border: 'none',
                   borderRadius: '6px',
                   padding: '7px',
-                  marginLeft: '30px',
+                  marginLeft: '5px',
                   fontWeight: 700,
                   fontSize: '0.9rem',
                   cursor: 'pointer',
@@ -178,7 +178,7 @@ function WeekAtGlance({ conferences, talks, onDeleteConference, onFlagTalk, onUn
                   <button onClick={() => handleUnsubscribe(conf.conference_id)} className="unsubscribe-btn">Unsubscribe</button>
                 </div>
                 <p className="item-details">
-                  <span>📍 {conf.loca}  📅 {new Date(conf.dates).toLocaleDateString()}</span>
+                  <span> {conf.loca}   {new Date(conf.dates).toLocaleDateString()}</span>
                 </p>
                 {renderTalks(conf.conference_id, false)}
               </li>
@@ -209,7 +209,7 @@ function WeekAtGlance({ conferences, talks, onDeleteConference, onFlagTalk, onUn
                     </button>
                   </div>
                   <p className="item-details">
-                    <span>📍 {conf.loca}  📅 {new Date(conf.dates).toLocaleDateString()}</span>
+                    <span> {conf.loca}   {new Date(conf.dates).toLocaleDateString()}</span>
                   </p>
                   {renderTalks(conf.conference_id, true)}
                 </li>

@@ -292,8 +292,14 @@ body, html {
 
 .message-list {
   margin-top: 1rem;
-  max-height: 300px;
+  max-height: 200px;
   overflow-y: auto;
+}
+
+.flag-message-list {
+  max-height: 200px;
+  overflow-y: auto;
+  margin-top: 1rem;
 }
 
 .message-item {

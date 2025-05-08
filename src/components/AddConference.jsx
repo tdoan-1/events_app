@@ -17,6 +17,7 @@ function AddConference() {
   const [activeTab, setActiveTab] = useState("create"); // "create" or "list"
   const [editingConference, setEditingConference] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -252,6 +253,12 @@ function AddConference() {
     setIsCreating(false);
   };
 
+  // Add this function to filter conferences
+  const filteredConferences = conferences.filter(conf => 
+    conf.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    conf.short_name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   if (loading) {
     return <div className="loading">Loading conferences...</div>;
   }
@@ -351,8 +358,20 @@ function AddConference() {
       {activeTab === "list" && (
         <div className="add-conference-container">
           <h2>Available Conferences</h2>
+          
+          {/* Add the search bar */}
+          <div className="search-container">
+            <input
+              type="text"
+              placeholder="Search conferences by name..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="search-input"
+            />
+          </div>
+
           <div className="conferences-list">
-            {conferences.map((conference) => (
+            {filteredConferences.map((conference) => (
               <div key={conference.conference_id} className="conference-card">
                 <div className="conference-info">
                   <h3>{conference.title}</h3>

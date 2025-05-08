@@ -248,4 +248,78 @@ router.post('/create', async (req, res) => {
   }
 });
 
+// PUT /api/conference/update/:id
+router.put('/update/:id', async (req, res) => {
+  const { id } = req.params;
+  const { title, short_name, loca, dates, userEmail } = req.body;
+  const parsedId = parseInt(id, 10);
+
+  if (isNaN(parsedId)) {
+    return res.status(400).json({ message: "Invalid conference ID." });
+  }
+
+  if (!title || !short_name || !loca || !dates || !userEmail) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
+
+  try {
+    // Find user who is trying to update
+    const authUser = await prisma.user.findUnique({ where: { email: userEmail } });
+    if (!authUser) return res.status(404).json({ message: "User not found." });
+
+    const baseId = parseInt(authUser.id);
+    const minId = baseId * 100; // e.g., if baseId is 200670, minId will be 20067000
+    const maxId = (baseId + 1) * 100 - 1; // e.g., if baseId is 200670, maxId will be 20067099
+
+    // Check if user is admin of this conference using a range check
+    const userRole = await prisma.users.findFirst({
+      where: {
+        conference_id: parsedId,
+        user_id: {
+          gte: minId,
+          lte: maxId
+        },
+        role_id: 2
+      }
+    });
+
+    if (!userRole) {
+      return res.status(403).json({ message: "Only admins can update conferences" });
+    }
+
+    // Parse the date string to ensure it's in the correct format
+    let parsedDate;
+    try {
+      parsedDate = new Date(dates);
+      if (isNaN(parsedDate.getTime())) {
+        throw new Error('Invalid date format');
+      }
+    } catch (error) {
+      return res.status(400).json({ message: "Invalid date format" });
+    }
+
+    // Update conference
+    const updatedConference = await prisma.conference.update({
+      where: { conference_id: parsedId },
+      data: {
+        title,
+        short_name,
+        loca,
+        dates: parsedDate
+      }
+    });
+
+    res.json({
+      message: "Conference updated successfully.",
+      data: updatedConference
+    });
+  } catch (error) {
+    console.error("Update conference error:", error);
+    res.status(500).json({ 
+      message: "Failed to update conference.",
+      error: error.message
+    });
+  }
+});
+
 module.exports = router;

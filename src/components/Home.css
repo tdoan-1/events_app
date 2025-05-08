@@ -320,3 +320,21 @@ body, html {
   max-height: 400px;
   overflow-y: auto;
 }
+
+.message-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.message-conference {
+  color: #64748b;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.message-time {
+  color: #64748b;
+  font-size: 0.75rem;
+}

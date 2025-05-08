@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import './Calendar.css';
 
-function Calendar() {
+function Calendar({ conferences = [] }) {
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [showPopup, setShowPopup] = useState(false);
 
   const daysInMonth = new Date(
     currentDate.getFullYear(),
@@ -31,6 +33,23 @@ function Calendar() {
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1));
   };
 
+  const getConferencesForDate = (day) => {
+    return conferences.filter(conf => {
+      const confDate = new Date(conf.dates);
+      return confDate.getDate() === day &&
+             confDate.getMonth() === currentDate.getMonth() &&
+             confDate.getFullYear() === currentDate.getFullYear();
+    });
+  };
+
+  const handleDayClick = (day) => {
+    const conferencesForDay = getConferencesForDate(day);
+    if (conferencesForDay.length > 0) {
+      setSelectedDate(day);
+      setShowPopup(true);
+    }
+  };
+
   const renderDays = () => {
     const days = [];
     const totalDays = 42; // 6 rows of 7 days
@@ -46,9 +65,17 @@ function Calendar() {
                      currentDate.getMonth() === new Date().getMonth() &&
                      currentDate.getFullYear() === new Date().getFullYear();
       
+      const conferencesForDay = getConferencesForDate(day);
+      const hasConferences = conferencesForDay.length > 0;
+      
       days.push(
-        <div key={day} className={`day ${isToday ? 'today' : ''}`}>
+        <div 
+          key={day} 
+          className={`day ${isToday ? 'today' : ''} ${hasConferences ? 'has-conferences' : ''}`}
+          onClick={() => handleDayClick(day)}
+        >
           {day}
+          {hasConferences && <div className="conference-dot"></div>}
         </div>
       );
     }
@@ -75,6 +102,25 @@ function Calendar() {
         ))}
         {renderDays()}
       </div>
+
+      {showPopup && selectedDate && (
+        <div className="calendar-popup-overlay" onClick={() => setShowPopup(false)}>
+          <div className="calendar-popup" onClick={e => e.stopPropagation()}>
+            <button className="close-popup" onClick={() => setShowPopup(false)}>&times;</button>
+            <h4>Conferences on {monthNames[currentDate.getMonth()]} {selectedDate}</h4>
+            <div className="conference-list">
+              {getConferencesForDate(selectedDate).map(conf => (
+                <div key={conf.conference_id} className="conference-item">
+                  <h5>{conf.title}</h5>
+                  <p className="conference-short-name">{conf.short_name}</p>
+                  <p className="conference-location">📍 {conf.loca}</p>
+                  <p className="conference-date">📅 {new Date(conf.dates).toLocaleDateString()}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

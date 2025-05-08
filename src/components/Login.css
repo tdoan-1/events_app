@@ -5,6 +5,10 @@
   min-height: 100vh;
   background-color: #f8fafc;
   padding: 20px;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 1rem;
 }
 
 .login-box {
@@ -13,7 +17,8 @@
   border-radius: 12px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   width: 100%;
-  max-width: 400px;
+  max-width: 1000px;
+  margin: 0 auto;
 }
 
 .login-box h1 {
@@ -99,4 +104,88 @@
 
 .link:hover {
   text-decoration: underline;
+}
+
+.fact-display {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  padding: 2rem;
+  margin: 2rem auto;
+  width: 80%;
+  max-width: 1000px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.fact-display h3 {
+  color: #2c3e50;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.fact-text {
+  color: #4a5568;
+  font-size: 1.2rem;
+  line-height: 1.8;
+  margin: 0;
+  padding: 0 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fact-text {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Update weather display styles */
+.weather-display {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1rem auto;
+  width: 80%;
+  max-width: 1000px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.weather-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.temperature {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.description {
+  font-size: 1.1rem;
+  color: #4a5568;
+  text-transform: capitalize;
+}
+
+.weather-message {
+  font-size: 1.1rem;
+  color: #4a5568;
+  font-style: italic;
+  margin-top: 0.5rem;
+  line-height: 1.4;
+  max-width: 600px;
 } 

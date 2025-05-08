@@ -98,6 +98,28 @@
   color: #f1c40f;
 }
 
+.item-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.edit-btn {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-right: 0.5rem;
+}
+
+.edit-btn:hover {
+  background: #2563eb;
+}
+
 @media (max-width: 768px) {
   .glance-sections {
     grid-template-columns: 1fr;

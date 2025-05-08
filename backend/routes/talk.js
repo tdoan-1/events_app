@@ -54,7 +54,7 @@ router.post('/create', async (req, res) => {
   });
   
   // API to flag talks
-router.post('/flag', async (req, res) => {
+  router.post('/flag', async (req, res) => {
     const { user_id, talks_id } = req.body;
   
     if (!user_id || !talks_id) {
@@ -68,7 +68,22 @@ router.post('/flag', async (req, res) => {
           talks_id: parseInt(talks_id)
         }
       });
-      res.status(201).json({ message: "Talk flagged successfully." });
+  
+      const talk = await prisma.talks.findUnique({
+        where: { talks_id: parseInt(talks_id) }
+      });
+  
+      const descText = talk.abstract.length > 25
+        ? `${talk.abstract.slice(0, 25)}...`
+        : talk.abstract;
+
+      await prisma.markers.create({
+        data: {
+          marker_desc: `🚩 Flagged: "${descText}"`
+        }
+      });
+  
+      res.status(201).json({ message: "Talk flagged and marker added." });
     } catch (error) {
       if (error.code === 'P2002') {
         res.status(400).json({ message: "Talk already flagged." });
@@ -78,6 +93,7 @@ router.post('/flag', async (req, res) => {
       }
     }
   });
+  
   
 // API to unflag talks
 router.delete('/unflag', async (req, res) => {

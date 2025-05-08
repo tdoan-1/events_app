@@ -18,6 +18,8 @@ function Home() {
   const [adminConferences, setAdminConferences] = useState([]);
   const [subscribedConferences, setSubscribedConferences] = useState([]);
   const [allMessages, setAllMessages] = useState([]);
+  const [flagNotifications, setFlagNotifications] = useState([]);
+
 
   const navigate = useNavigate();
 
@@ -161,6 +163,27 @@ function Home() {
       fetchAllMessages();
     }
   }, [adminConferences, subscribedConferences, user?.id]);
+
+  
+  useEffect(() => {
+    const fetchMarkers = () => {
+      fetch("http://localhost:5000/api/markers")
+        .then(res => res.json())
+        .then(data => {
+          setFlagNotifications(data);
+          console.log("✅ flagNotifications fetched:", data);
+        })
+        .catch(err => console.error("❌ Error fetching flag notifications:", err));
+    };
+  
+    fetchMarkers(); // Run once immediately
+    const interval = setInterval(fetchMarkers, 2000); // Then every 2 seconds
+  
+    return () => clearInterval(interval); // Clean up on unmount
+  }, []);
+  
+  
+  
 
   const handleDeleteConference = async (conferenceId) => {
     if (!user?.id) {
@@ -367,6 +390,25 @@ function Home() {
                     </div>
                   ))}
               </div>
+
+              <div className="flag-message-list" style={{ marginTop: "1rem" }}>
+                <h4 style={{ marginBottom: "0.5rem" }}>Talk Alerts</h4>
+                {flagNotifications.length === 0 ? (
+                  <p style={{ fontStyle: "italic", color: "#888" }}>No flagged talk alerts.</p>
+                ) : (
+                  <ul style={{ paddingLeft: "1.25rem" }}>
+                    {flagNotifications
+                      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                      .map(note => (
+                        <li key={note.marker_id} style={{ marginBottom: "0.5rem", color: "#334155" }}>
+                          {note.marker_desc}
+                        </li>
+                      ))}
+                  </ul>
+                )}
+              </div>
+
+
             </div>
           ) : (
             <div className="user-messages">

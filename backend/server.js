@@ -18,6 +18,7 @@ const talkRoutes = require('./routes/talk');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const announcementRoutes = require('./routes/announcement');
+const markerRoutes = require('./routes/marker');
 
 // ✅ Route mounting
 app.use('/api/conference', conferenceRoutes);
@@ -25,6 +26,8 @@ app.use('/api/talk', talkRoutes);
 app.use('/api', authRoutes);
 app.use('/api', userRoutes); // mount at /api/user-id
 app.use('/api/announcement', announcementRoutes);
+app.use('/api/markers', markerRoutes);
+
 
 
 // ✅ Test DB connection

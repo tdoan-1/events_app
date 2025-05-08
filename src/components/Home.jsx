@@ -127,7 +127,7 @@ function Home() {
       const subscribedConfs = conferences.filter(conf => 
         conf.users?.some(u => 
           u.user_id.toString().startsWith(user.id.toString()) && 
-          u.role_id === 1  // role_id 1 is for regular subscribers
+          (u.role_id === 1 || u.role_id === 2)  // include both subscribers and admins
         )
       );
       setSubscribedConferences(subscribedConfs);

@@ -58,6 +58,17 @@ body, html {
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
 }
 
+.box.week-at-glance::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: #3b82f6;
+  border-radius: 4px 4px 0 0;
+}
+
 .week-at-glance {
   position: relative;
   min-height: fit-content;
@@ -66,24 +77,12 @@ body, html {
   overflow-x: hidden;
 }
 
-.week-at-glance::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #3b82f6, #60a5fa);
-  border-radius: 4px 4px 0 0;
-}
-
 .week-at-glance h3 {
   color: #1e293b;
   margin-bottom: 1rem;
   font-size: 1.35rem;
   font-weight: 600;
   padding-bottom: 0.75rem;
-  border-bottom: 2px solid #e2e8f0;
   display: flex;
   align-items: center;
   gap: 0.5rem;

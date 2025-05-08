@@ -49,7 +49,14 @@ function AddConference() {
       fetch(`http://localhost:5000/api/conference/list?email=${user.email}`)
         .then(response => response.json())
         .then(data => {
-          setSubscribedConferences(data.map(conf => conf.conference_id));
+          // Consider both role_id 1 and 2 as subscribed
+          const subscribedIds = data.filter(conf => 
+            conf.users?.some(u => 
+              u.user_id.toString().startsWith(user.id.toString()) && 
+              (u.role_id === 1 || u.role_id === 2)
+            )
+          ).map(conf => conf.conference_id);
+          setSubscribedConferences(subscribedIds);
         })
         .catch(error => {
           console.error("Error fetching subscribed conferences:", error);
@@ -88,15 +95,26 @@ function AddConference() {
       const data = await response.json();
 
       if (response.ok) {
-        setMessage("✅ Conference created successfully! You are now an admin of this conference.");
         setTitle("");
         setShortName("");
         setLoca("");
         setDates("");
-        // Refresh the conferences list
+        // Refresh both conferences list and subscribed conferences
         const updatedConferences = await fetch("http://localhost:5000/api/conference/list")
           .then(res => res.json());
         setConferences(updatedConferences);
+        
+        // Update subscribed conferences list
+        const subscribedData = await fetch(`http://localhost:5000/api/conference/list?email=${user.email}`)
+          .then(res => res.json());
+        const subscribedIds = subscribedData.filter(conf => 
+          conf.users?.some(u => 
+            u.user_id.toString().startsWith(user.id.toString()) && 
+            (u.role_id === 1 || u.role_id === 2)
+          )
+        ).map(conf => conf.conference_id);
+        setSubscribedConferences(subscribedIds);
+        
         // Switch to the list tab
         setActiveTab("list");
       } else {
@@ -211,7 +229,6 @@ function AddConference() {
       const data = await response.json();
 
       if (response.ok) {
-        setMessage("✅ Conference updated successfully!");
         // Reset form
         setTitle("");
         setShortName("");

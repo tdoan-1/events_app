@@ -228,7 +228,6 @@ function AddConference() {
       const data = await response.json();
 
       if (response.ok) {
-        setMessage("✅ Conference updated successfully!");
         // Reset form
         setTitle("");
         setShortName("");

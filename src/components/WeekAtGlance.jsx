@@ -112,7 +112,7 @@ function WeekAtGlance({ conferences, talks, onDeleteConference, onFlagTalk, onUn
                   border: 'none',
                   borderRadius: '6px',
                   padding: '7px',
-                  marginLeft: '10px',
+                  marginLeft: '30px',
                   fontWeight: 700,
                   fontSize: '0.9rem',
                   cursor: 'pointer',
